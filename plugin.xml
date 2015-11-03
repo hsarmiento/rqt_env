@@ -1,0 +1,20 @@
+<library path="lib/libagent_gui">
+  <class name="Env" type="rqt_env.env.Topic" base_class_type="rqt_gui_py::Plugin">
+    <description>
+      A Python GUI Plugin for Environment variables configuration
+    </description>
+    <qtgui>
+      <!-- optional grouping...
+      <group>
+        <label>Group</label>
+      </group>
+      <group>
+        <label>Subgroup</label>
+      </group>
+      -->
+      <label>Enviroment Variables Configuration</label>
+      <icon type="theme">system-search</icon>
+      <statustip>A Python GUI Plugin for Environment variables configuration</statustip>
+    </qtgui>
+  </class>
+</library>

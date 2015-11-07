@@ -1,16 +1,17 @@
 #!/usr/bin/env python
 from __future__ import division
 import os
-
+import sys
 from python_qt_binding import loadUi
 from python_qt_binding.QtCore import Qt, QTimer, Signal, Slot
-from python_qt_binding.QtGui import QHeaderView, QIcon, QMenu, QTreeWidgetItem, QWidget, QPushButton
+from python_qt_binding.QtGui import QHeaderView, QIcon, QMenu, QTreeWidgetItem, QWidget, QPushButton, QApplication
 import roslib
 import rospkg
 import rospy
 from rospy.exceptions import ROSException
 
 from .env_info import TopicInfo
+from .env_new_robot import NewRobot
 
 
 class TopicWidget(QWidget):
@@ -100,6 +101,8 @@ class TopicWidget(QWidget):
         # self._timer_refresh_topics = QTimer(self)
         # self._timer_refresh_topics.timeout.connect(self.refresh_topics)
         self.refresh_topics()
+
+
     def click_btnApply(self):
         print "Test click_btnApply"
     
@@ -111,7 +114,7 @@ class TopicWidget(QWidget):
         self.btnModifyRos.setEnabled(False)
         self.btnRemoveRos.setEnabled(False)
         self.btnSaveRos.setEnabled(True)
-        
+
     def click_btnModifyRos(self):
         print "Test clic_btnModifyRos"
   
@@ -127,6 +130,9 @@ class TopicWidget(QWidget):
                 
     def click_btnAddRobot(self):
         print "Test click_btnAddRobot"
+        q = NewRobot()
+        q.exec_()
+        # sys.exit(App.exec_())
 
     def click_btnModifyRobot(self):
         print "Test click_btnModifyRobot"
@@ -461,6 +467,8 @@ class TreeWidgetItem(QTreeWidgetItem):
         super(TreeWidgetItem, self).setData(column, role, value)
         if role == Qt.CheckStateRole and state != self.checkState(column):
             self._check_state_changed_callback(self._topic_name)
+
+
 
 
 

@@ -7,11 +7,11 @@
     <x>0</x>
     <y>0</y>
     <width>854</width>
-    <height>534</height>
+    <height>494</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Environment Variables Configuration</string>
+   <string>Enviroment Variables Configuration</string>
   </property>
   <widget class="QTabWidget" name="tabWidget">
    <property name="geometry">
@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -196,32 +196,6 @@
      </property>
     </widget>
    </widget>
-  </widget>
-  <widget class="QPushButton" name="btnApply">
-   <property name="geometry">
-    <rect>
-     <x>610</x>
-     <y>470</y>
-     <width>81</width>
-     <height>30</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Apply</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="btnAccept">
-   <property name="geometry">
-    <rect>
-     <x>710</x>
-     <y>470</y>
-     <width>81</width>
-     <height>30</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Accept</string>
-   </property>
   </widget>
  </widget>
  <resources/>

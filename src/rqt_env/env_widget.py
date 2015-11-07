@@ -4,7 +4,7 @@ import os
 
 from python_qt_binding import loadUi
 from python_qt_binding.QtCore import Qt, QTimer, Signal, Slot
-from python_qt_binding.QtGui import QHeaderView, QIcon, QMenu, QTreeWidgetItem, QWidget
+from python_qt_binding.QtGui import QHeaderView, QIcon, QMenu, QTreeWidgetItem, QWidget, QPushButton
 import roslib
 import rospkg
 import rospy
@@ -24,7 +24,9 @@ class TopicWidget(QWidget):
     SELECT_BY_MSGTYPE = 1
 
     _column_names = ['topic', 'type', 'bandwidth', 'rate', 'value']
-
+    #_column_names = ['variable', 'value']
+    #_column_names_robot=['name','ip','status']
+    _column_names_robot = ['topic', 'type', 'bandwidth', 'rate', 'value']
     def __init__(self, plugin=None, selected_topics=None, select_topic_type=SELECT_BY_NAME):
         """
         @type selected_topics: list of tuples.
@@ -43,11 +45,41 @@ class TopicWidget(QWidget):
         ui_file = os.path.join(rp.get_path('rqt_env'), 'resource', 'EnvWidget.ui')
         loadUi(ui_file, self)
         self._plugin = plugin
-        self.topics_tree_widget.sortByColumn(0, Qt.AscendingOrder)
-        header = self.topics_tree_widget.header()
+        #tree_widget ROS
+        self.env_ros_tree_widget.sortByColumn(0, Qt.AscendingOrder)
+        header = self.env_ros_tree_widget.header()
         header.setResizeMode(QHeaderView.ResizeToContents)
         header.customContextMenuRequested.connect(self.handle_header_view_customContextMenuRequested)
         header.setContextMenuPolicy(Qt.CustomContextMenu)
+        
+        #tree_widget ROBOT
+        self.env_robot_tree_widget.sortByColumn(0, Qt.AscendingOrder)
+        self.env_robot_tree_widget.setEditTriggers(self.env_robot_tree_widget.NoEditTriggers)
+        self.env_robot_tree_widget.itemDoubleClicked.connect(self.checkEdit)
+        header_robot=self.env_robot_tree_widget.header()
+        header_robot.setResizeMode(QHeaderView.ResizeToContents)
+        header_robot.customContextMenuRequested.connect(self.handle_header_view_customContextMenuRequested)
+        header_robot.setContextMenuPolicy(Qt.CustomContextMenu)
+
+        #clicked buttons General
+        
+        
+        self.btnApply.clicked.connect(self.click_btnApply)
+        self.btnAccept.clicked.connect(self.click_btnAccept)
+        #clicked buttons ROS
+        self.btnAddRos.clicked.connect(self.click_btnAddRos)
+        self.btnModifyRos.clicked.connect(self.click_btnModifyRos)
+        self.btnSaveRos.clicked.connect(self.click_btnSaveRos)
+        self.btnRemoveRos.clicked.connect(self.click_btnRemoveRos)
+
+        #clicked buttons robots
+        self.btnAddRobot.clicked.connect(self.click_btnAddRobot)
+        self.btnModifyRobot.clicked.connect(self.click_btnModifyRobot)
+        self.btnSaveRobot.clicked.connect(self.click_btnSaveRobot)
+        self.btnRemoveRobot.clicked.connect(self.click_btnRemoveRobot)
+
+
+      
 
         # Whether to get all topics or only the topics that are set in advance.
         # Can be also set by the setter method "set_selected_topics".
@@ -60,12 +92,58 @@ class TopicWidget(QWidget):
         for column_name in self._column_names:
             self._column_index[column_name] = len(self._column_index)
 
+       
+
         # self.refresh_topics()
 
         # init and start update timer
         # self._timer_refresh_topics = QTimer(self)
         # self._timer_refresh_topics.timeout.connect(self.refresh_topics)
         self.refresh_topics()
+    def click_btnApply(self):
+        print "Test click_btnApply"
+    
+    def click_btnAccept(self):
+        print "Test click_btnAccept"
+    
+    def click_btnAddRos(self):
+        print "Test Click_btnAddRos"
+        self.btnModifyRos.setEnabled(False)
+        self.btnRemoveRos.setEnabled(False)
+        self.btnSaveRos.setEnabled(True)
+        
+    def click_btnModifyRos(self):
+        print "Test clic_btnModifyRos"
+  
+    def click_btnSaveRos(self):
+        print "Test click_btnSaveRos"
+        self.btnSaveRos.setEnabled(False)
+        self.btnRemoveRos.setEnabled(True)
+        self.btnModifyRos.setEnabled(True)
+
+    def click_btnRemoveRos(self):
+        self._recursive_delete_widget_items(self._tree_items['TURTLEBOT_BASE'])
+        print "Test click_btnRemoveRos s"
+                
+    def click_btnAddRobot(self):
+        print "Test click_btnAddRobot"
+
+    def click_btnModifyRobot(self):
+        print "Test click_btnModifyRobot"
+
+    def click_btnSaveRobot(self):
+        print "Test click_btnSaveRobot"
+
+    def click_btnRemoveRobot(self):
+        print "Test click_btnRemoveRobot"
+
+
+    def checkEdit(self,item,column):
+        print "item" , item
+        print "col" , column
+        if column > 0:
+            self.env_robot_tree_widget.editItem(item, column)
+
 
     def set_topic_specifier(self, specifier):
         self._select_topic_type = specifier
@@ -79,7 +157,7 @@ class TopicWidget(QWidget):
     def refresh_topics(self):
         print "add . . ."
         #topic_list = rospy.get_published_topics()
-        topic_list= [['1', 'test1'], ['2', 'test2']]
+        topic_list= [['TURTLEBOT_BASE', 'kobuki'], ['ROS_HOSTNAME', 'localhost']]
         #print tlist
         new_topics = {}
         for topic_name, topic_type in topic_list:
@@ -92,12 +170,20 @@ class TopicWidget(QWidget):
                 #if topic_info.message_class is not None:
                 #   message_instance = topic_info.message_class()
                 # add it to the dict and tree view
-                topic_item = self._recursive_create_widget_items(self.topics_tree_widget, topic_name, topic_type, message_instance)
+                topic_item = self._recursive_create_widget_items(self.env_ros_tree_widget, topic_name, topic_type, message_instance)
                 new_topics[topic_name] = {
                    'item': topic_item,
                    'info': topic_info,
                    'type': topic_type,
                 }
+
+                topic_item = self._recursive_create_widget_items(self.env_robot_tree_widget, topic_name, topic_type, message_instance)
+                new_topics[topic_name] = {
+                   'item': topic_item,
+                   'info': topic_info,
+                   'type': topic_type,
+                }
+
             else:
                 # if topic has been seen before, copy it to new dict and
                 # remove it from the old one
@@ -155,7 +241,7 @@ class TopicWidget(QWidget):
                     if topic_info.message_class is not None:
                         message_instance = topic_info.message_class()
                     # add it to the dict and tree view
-                    topic_item = self._recursive_create_widget_items(self.topics_tree_widget, topic_name, topic_type, message_instance)
+                    topic_item = self._recursive_create_widget_items(self.env_ros_tree_widget, topic_name, topic_type, message_instance)
                     new_topics[topic_name] = {
                        'item': topic_item,
                        'info': topic_info,
@@ -170,9 +256,9 @@ class TopicWidget(QWidget):
             # clean up old topics
             for topic_name in self._topics.keys():
                 self._topics[topic_name]['info'].stop_monitoring()
-                index = self.topics_tree_widget.indexOfTopLevelItem(
+                index = self.env_ros_tree_widget.indexOfTopLevelItem(
                                            self._topics[topic_name]['item'])
-                self.topics_tree_widget.takeTopLevelItem(index)
+                self.env_ros_tree_widget.takeTopLevelItem(index)
                 del self._topics[topic_name]
 
             # switch to new topic dict
@@ -249,12 +335,12 @@ class TopicWidget(QWidget):
         topic_text = topic_name
         item = TreeWidgetItem(self._toggle_monitoring, topic_name, parent)
         item.setText(self._column_index['topic'], topic_text)
-        item.setText(self._column_index['type'], type_name)
+        item.setText(self._column_index['type'], type_name) 
         return item
-       
+
 
     def _recursive_create_widget_items1(self, parent, topic_name, type_name, message):
-        if parent is self.topics_tree_widget:
+        if parent is self.env_ros_tree_widget:
             # show full topic name with preceding namespace on toplevel item
             topic_text = topic_name
             item = TreeWidgetItem(self._toggle_monitoring, topic_name, parent)
@@ -300,7 +386,7 @@ class TopicWidget(QWidget):
 
     @Slot('QPoint')
     def handle_header_view_customContextMenuRequested(self, pos):
-        header = self.topics_tree_widget.header()
+        header = self.env_ros_tree_widget.header()
 
         # show context menu
         menu = QMenu(self)
@@ -315,8 +401,8 @@ class TopicWidget(QWidget):
                 header.setResizeMode(QHeaderView.ResizeToContents)
 
     @Slot('QPoint')
-    def on_topics_tree_widget_customContextMenuRequested(self, pos):
-        item = self.topics_tree_widget.itemAt(pos)
+    def on_env_ros_tree_widget_customContextMenuRequested(self, pos):
+        item = self.env_ros_tree_widget.itemAt(pos)
         if item is None:
             return
 
@@ -324,7 +410,7 @@ class TopicWidget(QWidget):
         menu = QMenu(self)
         action_item_expand = menu.addAction(QIcon.fromTheme('zoom-in'), 'Expand All Children')
         action_item_collapse = menu.addAction(QIcon.fromTheme('zoom-out'), 'Collapse All Children')
-        action = menu.exec_(self.topics_tree_widget.mapToGlobal(pos))
+        action = menu.exec_(self.env_ros_tree_widget.mapToGlobal(pos))
 
         # evaluate user action
         if action in (action_item_expand, action_item_collapse):
@@ -352,13 +438,13 @@ class TopicWidget(QWidget):
 
     # TODO(Enhancement) Save/Restore tree expansion state
     def save_settings(self, plugin_settings, instance_settings):
-        header_state = self.topics_tree_widget.header().saveState()
+        header_state = self.env_ros_tree_widget.header().saveState()
         instance_settings.set_value('tree_widget_header_state', header_state)
 
     def restore_settings(self, pluggin_settings, instance_settings):
         if instance_settings.contains('tree_widget_header_state'):
             header_state = instance_settings.value('tree_widget_header_state')
-            if not self.topics_tree_widget.header().restoreState(header_state):
+            if not self.env_ros_tree_widget.header().restoreState(header_state):
                 rospy.logwarn("rqt_topic: Failed to restore header state.")
 
 class TreeWidgetItem(QTreeWidgetItem):
@@ -375,3 +461,6 @@ class TreeWidgetItem(QTreeWidgetItem):
         super(TreeWidgetItem, self).setData(column, role, value)
         if role == Qt.CheckStateRole and state != self.checkState(column):
             self._check_state_changed_callback(self._topic_name)
+
+
+

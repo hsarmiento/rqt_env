@@ -1,4 +1,4 @@
-<library path="lib/libagent_gui">
+<library path="src">
   <class name="Env" type="rqt_env.env.Topic" base_class_type="rqt_gui_py::Plugin">
     <description>
       A Python GUI Plugin for Environment variables configuration

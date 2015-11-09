@@ -154,10 +154,14 @@ class TopicWidget(QWidget):
         reply = QMessageBox.question(self, 'Message', quit_msg, QMessageBox.Yes, QMessageBox.No)
 
         if reply == QMessageBox.Yes:
-            pass
+            self.removeSelectedItemWidgetTree()
         else:
             pass
 
+    def removeSelectedItemWidgetTree(self):
+        root = self.env_robot_tree_widget.invisibleRootItem()
+        for item in self.env_robot_tree_widget.selectedItems():
+            (item.parent() or root).removeChild(item)
 
     def checkEdit(self,item,column):
         print "item" , item

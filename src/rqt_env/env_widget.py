@@ -4,7 +4,7 @@ import os
 import sys
 from python_qt_binding import loadUi
 from python_qt_binding.QtCore import Qt, QTimer, Signal, Slot
-from python_qt_binding.QtGui import QHeaderView, QIcon, QMenu, QTreeWidgetItem, QWidget, QPushButton, QApplication
+from python_qt_binding.QtGui import QHeaderView, QIcon, QMenu, QTreeWidgetItem, QWidget, QPushButton, QMessageBox
 import roslib
 import rospkg
 import rospy
@@ -124,9 +124,17 @@ class TopicWidget(QWidget):
         self.btnRemoveRos.setEnabled(True)
         self.btnModifyRos.setEnabled(True)
 
+
     def click_btnRemoveRos(self):
-        self._recursive_delete_widget_items(self._tree_items['TURTLEBOT_BASE'])
+        # 
         print "Test click_btnRemoveRos s"
+        quit_msg = "Are you sure you want to remove this element?"
+        reply = QMessageBox.question(self, 'Message', quit_msg, QMessageBox.Yes, QMessageBox.No)
+
+        if reply == QMessageBox.Yes:
+            self._recursive_delete_widget_items(self._tree_items['TURTLEBOT_BASE'])
+        else:
+            pass
                 
     def click_btnAddRobot(self):
         print "Test click_btnAddRobot"
@@ -142,6 +150,13 @@ class TopicWidget(QWidget):
 
     def click_btnRemoveRobot(self):
         print "Test click_btnRemoveRobot"
+        quit_msg = "Are you sure you want to remove this element?"
+        reply = QMessageBox.question(self, 'Message', quit_msg, QMessageBox.Yes, QMessageBox.No)
+
+        if reply == QMessageBox.Yes:
+            pass
+        else:
+            pass
 
 
     def checkEdit(self,item,column):

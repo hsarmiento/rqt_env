@@ -457,8 +457,7 @@ class TopicWidget(QWidget):
         @param selected_topics: list of tuple. [(topic_name, topic_type)]
         @type selected_topics: []
         """
-        rospy.logdebug('set_selected_topics topics={}'.format(
-                                                         len(selected_topics)))
+        rospy.logdebug('set_selected_topics topics={}'.format(len(selected_topics)))
         self._selected_topics = selected_topics
 
     # TODO(Enhancement) Save/Restore tree expansion state
@@ -472,13 +471,13 @@ class TopicWidget(QWidget):
             if not self.env_ros_tree_widget.header().restoreState(header_state):
                 rospy.logwarn("rqt_topic: Failed to restore header state.")
 
-class TreeWidgetItem(QTreeWidgetItem):
 
+class TreeWidgetItem(QTreeWidgetItem):
     def __init__(self, check_state_changed_callback, topic_name, parent=None):
         super(TreeWidgetItem, self).__init__(parent)
         self._check_state_changed_callback = check_state_changed_callback
         self._topic_name = topic_name
-        self.setCheckState(0, Qt.Unchecked)
+        self.setCheckState(2, Qt.Unchecked)   #ACA AGREGA EL CHECKBOX COMO CHECKED O UNCHECKED
 
     def setData(self, column, role, value):
         if role == Qt.CheckStateRole:

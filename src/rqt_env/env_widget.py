@@ -10,8 +10,9 @@ import rospkg
 import rospy
 from rospy.exceptions import ROSException
 
-from .env_info import TopicInfo
+# from .env_info import TopicInfo
 from .env_new_robot import NewRobot
+from .xml_info import XmlInfo 
 
 
 class TopicWidget(QWidget):
@@ -102,6 +103,9 @@ class TopicWidget(QWidget):
         # self._timer_refresh_topics.timeout.connect(self.refresh_topics)
         self.refresh_topics()
 
+        
+        # print self._xml_info.getRobots()
+
 
     def click_btnApply(self):
         print "Test click_btnApply"
@@ -137,6 +141,7 @@ class TopicWidget(QWidget):
             pass
                 
     def click_btnAddRobot(self):
+        print self._listRobots
         print "Test click_btnAddRobot"
         q = NewRobot()
         q.exec_()
@@ -178,11 +183,15 @@ class TopicWidget(QWidget):
         This method needs to be called to start updating topic pane.
         """
         self._timer_refresh_topics.start(1000)
-    @Slot()
+
+
+    # @Slot()
     def refresh_topics(self):
         print "add . . ."
-        #topic_list = rospy.get_published_topics()
-        topic_list= [['TURTLEBOT_BASE', 'kobuki'], ['ROS_HOSTNAME', 'localhost']]
+        self._xml_info = XmlInfo()
+        self._xml_info.openXml()
+        topic_list = self._xml_info.getGeneralVariables()
+        # topic_list= [['TURTLEBOT_BASE', 'kobuki'], ['ROS_HOSTNAME', 'localhost']]
         #print tlist
         new_topics = {}
         for topic_name, topic_type in topic_list:
@@ -202,12 +211,12 @@ class TopicWidget(QWidget):
                    'type': topic_type,
                 }
 
-                topic_item = self._recursive_create_widget_items(self.env_robot_tree_widget, topic_name, topic_type, message_instance)
-                new_topics[topic_name] = {
-                   'item': topic_item,
-                   'info': topic_info,
-                   'type': topic_type,
-                }
+                # topic_item = self._recursive_create_widget_items(self.env_robot_tree_widget, topic_name, topic_type, message_instance)
+                # new_topics[topic_name] = {
+                #    'item': topic_item,
+                #    'info': topic_info,
+                #    'type': topic_type,
+                # }
 
             else:
                 # if topic has been seen before, copy it to new dict and

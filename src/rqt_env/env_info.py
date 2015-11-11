@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 
+
+
+#ESTO NO SIRVE Y ES SOSPECHOOOOSOOOO (YA TAMOS)
+
+
 from __future__ import division, with_statement
 from StringIO import StringIO
 

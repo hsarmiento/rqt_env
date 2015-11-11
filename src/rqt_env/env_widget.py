@@ -103,8 +103,6 @@ class TopicWidget(QWidget):
         # self._timer_refresh_topics.timeout.connect(self.refresh_topics)
         self.refresh_topics()
 
-        
-        # print self._xml_info.getRobots()
 
 
     def click_btnApply(self):
@@ -187,23 +185,19 @@ class TopicWidget(QWidget):
 
     # @Slot()
     def refresh_topics(self):
-        print "add . . ."
         self._xml_info = XmlInfo()
         self._xml_info.openXml()
-        topic_list = self._xml_info.getGeneralVariables()
+        general_list = self._xml_info.getGeneralVariables()
+        robots_list = self._xml_info.getRobots()
         # topic_list= [['TURTLEBOT_BASE', 'kobuki'], ['ROS_HOSTNAME', 'localhost']]
-        #print tlist
         new_topics = {}
-        for topic_name, topic_type in topic_list:
+        for topic_name, topic_type in general_list:
                 # if topic is new or has changed its type
             if topic_name not in self._topics or \
                self._topics[topic_name]['type'] != topic_type:
                 # create new TopicInfo
                 topic_info = 'ss'#opicInfo(topic_name, topic_type)
                 message_instance = None
-                #if topic_info.message_class is not None:
-                #   message_instance = topic_info.message_class()
-                # add it to the dict and tree view
                 topic_item = self._recursive_create_widget_items(self.env_ros_tree_widget, topic_name, topic_type, message_instance)
                 new_topics[topic_name] = {
                    'item': topic_item,
@@ -211,17 +205,31 @@ class TopicWidget(QWidget):
                    'type': topic_type,
                 }
 
-                # topic_item = self._recursive_create_widget_items(self.env_robot_tree_widget, topic_name, topic_type, message_instance)
-                # new_topics[topic_name] = {
-                #    'item': topic_item,
-                #    'info': topic_info,
-                #    'type': topic_type,
-                # }
-
             else:
                 # if topic has been seen before, copy it to new dict and
                 # remove it from the old one
                 new_topics[topic_name] = self._topics[topic_name]
+                del self._topics[topic_name]
+
+        new_topics_robots = {}
+        for topic_name, topic_type,status in robots_list:
+                # if topic is new or has changed its type
+            if topic_name not in self._topics or \
+               self._topics[topic_name]['type'] != topic_type:
+                # create new TopicInfo
+                topic_info = 'ss'#opicInfo(topic_name, topic_type)
+                message_instance = None
+                topic_item = self._recursive_create_widget_items(self.env_robot_tree_widget, topic_name, topic_type, message_instance)
+                new_topics_robots[topic_name] = {
+                   'item': topic_item,
+                   'info': topic_info,
+                   'type': topic_type,
+                }
+
+            else:
+                # if topic has been seen before, copy it to new dict and
+                # remove it from the old one
+                new_topics_robots[topic_name] = self._topics[topic_name]
                 del self._topics[topic_name]
 
     @Slot()

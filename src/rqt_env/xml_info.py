@@ -25,5 +25,13 @@ class XmlInfo(object):
 				l.append([node.attrib['name'],node.attrib['value']])
 		return l
 
+	def getRobots(self):
+		l = []
+		for elem in self._root.iter(tag='robot'):
+			for node in elem.iterfind('variable'):
+				if node.attrib['name'] == 'ROS_MASTER_URI':
+					l.append([elem.attrib['id'],node.attrib['value'],elem.attrib['status']])
+		return l
+
 
 

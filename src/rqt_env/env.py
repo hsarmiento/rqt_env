@@ -1,16 +1,16 @@
 #!/usr/bin/env python
 from rqt_gui_py.plugin import Plugin
 
-from .env_widget import TopicWidget
+from .env_widget import EnvWidget
 
 
-class Topic(Plugin):
+class Env(Plugin):
 
     def __init__(self, context):
-        super(Topic, self).__init__(context)
-        self.setObjectName('Topic')
+        super(Env, self).__init__(context)
+        self.setObjectName('Env')
 
-        self._widget = TopicWidget(self)
+        self._widget = EnvWidget(self)
 
         # self._widget.start()
         if context.serial_number() > 1:
@@ -25,3 +25,4 @@ class Topic(Plugin):
 
     def restore_settings(self, plugin_settings, instance_settings):
         self._widget.restore_settings(plugin_settings, instance_settings)
+

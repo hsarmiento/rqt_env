@@ -16,11 +16,11 @@ from .xml_info import XmlInfo
  
 
 
-class TopicWidget(QWidget):
+class EnvWidget(QWidget):
     """
     main class inherits from the ui window class.
     You can specify the topics that the topic pane.
-    TopicWidget.start must be called in order to update topic pane.
+    EnvWidget.start must be called in order to update topic pane.
     """
 
     SELECT_BY_NAME = 0
@@ -40,7 +40,7 @@ class TopicWidget(QWidget):
                                   show. If 'select_topic_type' argument is
                                   None, this arg shouldn't be meaningful.
         """
-        super(TopicWidget, self).__init__()
+        super(EnvWidget, self).__init__()
 
         self._select_topic_type = select_topic_type
 

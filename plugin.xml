@@ -1,5 +1,5 @@
 <library path="src">
-  <class name="Env" type="rqt_env.env.Topic" base_class_type="rqt_gui_py::Plugin">
+  <class name="Env" type="rqt_env.env.Env" base_class_type="rqt_gui_py::Plugin">
     <description>
       A Python GUI Plugin for Environment variables configuration
     </description>

@@ -32,6 +32,13 @@ class XmlInfo(object):
 				if node.attrib['name'] == 'ROS_MASTER_URI':
 					l.append([elem.attrib['id'],node.attrib['value'],elem.attrib['status']])
 		return l
+		
+	def removeGeneralVariable(self):
+		 for elem in self._root.iter(tag='general'):
+		 	rank = int(elem.find('variable').text)
+		 	if rank > 50:
+		 		root.remove(country)
+		 		tree.write('output.xml')
 
 
 

@@ -13,6 +13,7 @@ from rospy.exceptions import ROSException
 # from .env_info import TopicInfo
 from .env_new_robot import NewRobot
 from .xml_info import XmlInfo 
+ 
 
 
 class TopicWidget(QWidget):
@@ -66,11 +67,9 @@ class TopicWidget(QWidget):
         #clicked buttons General
         
         
-        self.btnApply.clicked.connect(self.click_btnApply)
-        self.btnAccept.clicked.connect(self.click_btnAccept)
+        self.btnApply.clicked.connect(self.click_btnApply) 
         #clicked buttons ROS
-        self.btnAddRos.clicked.connect(self.click_btnAddRos)
-        self.btnModifyRos.clicked.connect(self.click_btnModifyRos)
+        self.btnNewRos.clicked.connect(self.click_btnNewRos) 
         self.btnSaveRos.clicked.connect(self.click_btnSaveRos)
         self.btnRemoveRos.clicked.connect(self.click_btnRemoveRos)
 
@@ -79,7 +78,7 @@ class TopicWidget(QWidget):
         self.btnModifyRobot.clicked.connect(self.click_btnModifyRobot)
         self.btnSaveRobot.clicked.connect(self.click_btnSaveRobot)
         self.btnRemoveRobot.clicked.connect(self.click_btnRemoveRobot)
-
+        
 
       
 
@@ -106,19 +105,22 @@ class TopicWidget(QWidget):
 
 
     def click_btnApply(self):
-        print "Test click_btnApply"
+        quit_msg = "Are you sure you want to Apply this configuration?"
+        reply = QMessageBox.question(self, 'Message', quit_msg, QMessageBox.Yes, QMessageBox.No)
+
+        if reply == QMessageBox.Yes:
+            print "OK"
+            pass
+        else:
+            pass
     
-    def click_btnAccept(self):
-        print "Test click_btnAccept"
-    
-    def click_btnAddRos(self):
-        print "Test Click_btnAddRos"
+   
+    def click_btnNewRos(self):
+        print "Test Click_btnNewRos"
         self.btnModifyRos.setEnabled(False)
         self.btnRemoveRos.setEnabled(False)
         self.btnSaveRos.setEnabled(True)
-
-    def click_btnModifyRos(self):
-        print "Test clic_btnModifyRos"
+ 
   
     def click_btnSaveRos(self):
         print "Test click_btnSaveRos"
@@ -139,7 +141,6 @@ class TopicWidget(QWidget):
             pass
                 
     def click_btnAddRobot(self):
-        print self._listRobots
         print "Test click_btnAddRobot"
         q = NewRobot()
         q.exec_()

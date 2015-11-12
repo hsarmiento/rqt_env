@@ -190,6 +190,7 @@ class TopicWidget(QWidget):
         self._xml_info.openXml()
         general_list = self._xml_info.getGeneralVariables()
         robots_list = self._xml_info.getRobots()
+        print robots_list
         # topic_list= [['TURTLEBOT_BASE', 'kobuki'], ['ROS_HOSTNAME', 'localhost']]
         new_topics = {}
         for topic_name, topic_type in general_list:
@@ -220,12 +221,13 @@ class TopicWidget(QWidget):
                 # create new TopicInfo
                 topic_info = 'ss'#opicInfo(topic_name, topic_type)
                 message_instance = None
-                topic_item = self._recursive_create_widget_items(self.env_robot_tree_widget, topic_name, topic_type, message_instance)
+                topic_item = self._recursive_create_widget_items(self.env_robot_tree_widget, topic_name, topic_type, message_instance,status)
                 new_topics_robots[topic_name] = {
                    'item': topic_item,
                    'info': topic_info,
                    'type': topic_type,
                 }
+                print topic_item
 
             else:
                 # if topic has been seen before, copy it to new dict and
@@ -233,81 +235,6 @@ class TopicWidget(QWidget):
                 new_topics_robots[topic_name] = self._topics[topic_name]
                 del self._topics[topic_name]
 
-    @Slot()
-    def refresh_topics1(self):
-        """
-        refresh tree view items
-        """
-
-        if self._selected_topics is None:
-            topic_list = rospy.get_published_topics()
-            if topic_list is None:
-                rospy.logerr('Not even a single published topic found. Check network configuration')
-                return
-        else:  # Topics to show are specified.
-            topic_list = self._selected_topics
-            topic_specifiers_server_all = None
-            topic_specifiers_required = None
-
-            rospy.logdebug('refresh_topics) self._selected_topics=%s' % (topic_list,))
-
-            if self._select_topic_type == self.SELECT_BY_NAME:
-                topic_specifiers_server_all = [name for name, type in rospy.get_published_topics()]
-                topic_specifiers_required = [name for name, type in topic_list]
-            elif self._select_topic_type == self.SELECT_BY_MSGTYPE:
-                # The topics that are required (by whoever uses this class).
-                topic_specifiers_required = [type for name, type in topic_list]
-
-                # The required topics that match with published topics.
-                topics_match = [(name, type) for name, type in rospy.get_published_topics() if type in topic_specifiers_required]
-                topic_list = topics_match
-                rospy.logdebug('selected & published topic types=%s' % (topic_list,))
-
-            rospy.logdebug('server_all=%s\nrequired=%s\ntlist=%s' % (topic_specifiers_server_all, topic_specifiers_required, topic_list))
-            if len(topic_list) == 0:
-                rospy.logerr('None of the following required topics are found.\n(NAME, TYPE): %s' % (self._selected_topics,))
-                return
-
-        if self._current_topic_list != topic_list:
-            self._current_topic_list = topic_list
-
-            # start new topic dict
-            new_topics = {}
-
-            for topic_name, topic_type in topic_list:
-                # if topic is new or has changed its type
-                if topic_name not in self._topics or \
-                   self._topics[topic_name]['type'] != topic_type:
-                    # create new TopicInfo
-                    topic_info = TopicInfo(topic_name, topic_type)
-                    message_instance = None
-                    if topic_info.message_class is not None:
-                        message_instance = topic_info.message_class()
-                    # add it to the dict and tree view
-                    topic_item = self._recursive_create_widget_items(self.env_ros_tree_widget, topic_name, topic_type, message_instance)
-                    new_topics[topic_name] = {
-                       'item': topic_item,
-                       'info': topic_info,
-                       'type': topic_type,
-                    }
-                else:
-                    # if topic has been seen before, copy it to new dict and
-                    # remove it from the old one
-                    new_topics[topic_name] = self._topics[topic_name]
-                    del self._topics[topic_name]
-
-            # clean up old topics
-            for topic_name in self._topics.keys():
-                self._topics[topic_name]['info'].stop_monitoring()
-                index = self.env_ros_tree_widget.indexOfTopLevelItem(
-                                           self._topics[topic_name]['item'])
-                self.env_ros_tree_widget.takeTopLevelItem(index)
-                del self._topics[topic_name]
-
-            # switch to new topic dict
-            self._topics = new_topics
-
-        self._update_topics_data()
 
     def _update_topics_data(self):
         for topic in self._topics.values():
@@ -374,42 +301,13 @@ class TopicWidget(QWidget):
                 array_size = 0
 
         return type_str, array_size
-    def _recursive_create_widget_items(self, parent, topic_name, type_name, message):
+    def _recursive_create_widget_items(self, parent, topic_name, type_name, message,status=None):
         topic_text = topic_name
-        item = TreeWidgetItem(self._toggle_monitoring, topic_name, parent)
+        item = TreeWidgetItem(self._toggle_monitoring, topic_name, parent,status)
         item.setText(self._column_index['topic'], topic_text)
         item.setText(self._column_index['type'], type_name) 
         return item
 
-
-    def _recursive_create_widget_items1(self, parent, topic_name, type_name, message):
-        if parent is self.env_ros_tree_widget:
-            # show full topic name with preceding namespace on toplevel item
-            topic_text = topic_name
-            item = TreeWidgetItem(self._toggle_monitoring, topic_name, parent)
-        else:
-            topic_text = topic_name.split('/')[-1]
-            if '[' in topic_text:
-                topic_text = topic_text[topic_text.index('['):]
-            item = QTreeWidgetItem(parent)
-        item.setText(self._column_index['topic'], topic_text)
-        item.setText(self._column_index['type'], type_name)
-        item.setData(0, Qt.UserRole, topic_name)
-        self._tree_items[topic_name] = item
-        if hasattr(message, '__slots__') and hasattr(message, '_slot_types'):
-            for slot_name, type_name in zip(message.__slots__, message._slot_types):
-                self._recursive_create_widget_items(item, topic_name + '/' + slot_name, type_name, getattr(message, slot_name))
-
-        else:
-            base_type_str, array_size = self._extract_array_info(type_name)
-            try:
-                base_instance = roslib.message.get_message_class(base_type_str)()
-            except (ValueError, TypeError):
-                base_instance = None
-            if array_size is not None and hasattr(base_instance, '__slots__'):
-                for index in range(array_size):
-                    self._recursive_create_widget_items(item, topic_name + '[%d]' % index, base_type_str, base_instance)
-        return item
 
     def _toggle_monitoring(self, topic_name):
         item = self._tree_items[topic_name]
@@ -491,11 +389,14 @@ class TopicWidget(QWidget):
 
 
 class TreeWidgetItem(QTreeWidgetItem):
-    def __init__(self, check_state_changed_callback, topic_name, parent=None):
+    def __init__(self, check_state_changed_callback, topic_name, parent=None,status=None):
         super(TreeWidgetItem, self).__init__(parent)
         self._check_state_changed_callback = check_state_changed_callback
         self._topic_name = topic_name
-        self.setCheckState(2, Qt.Unchecked)   #ACA AGREGA EL CHECKBOX COMO CHECKED O UNCHECKED
+        if status == '1':
+            self.setCheckState(2, Qt.Checked)
+        elif status == '0':
+            self.setCheckState(2, Qt.Unchecked)   #ACA AGREGA EL CHECKBOX COMO CHECKED O UNCHECKED
 
     def setData(self, column, role, value):
         if role == Qt.CheckStateRole:

@@ -9,9 +9,7 @@ import roslib
 import rospkg
 import rospy
 from rospy.exceptions import ROSException
-
-# from .env_info import TopicInfo
-from .env_new_robot import NewRobot
+from .env_dialog_robot import DialogRobot
 from .xml_info import XmlInfo 
  
 
@@ -50,22 +48,21 @@ class EnvWidget(QWidget):
         self._plugin = plugin
         #tree_widget ROS
         self.env_ros_tree_widget.sortByColumn(0, Qt.AscendingOrder)
+        self.env_ros_tree_widget.clicked.connect(self.show_click_row)
+
         header = self.env_ros_tree_widget.header()
-        header.setResizeMode(QHeaderView.ResizeToContents)
-        header.customContextMenuRequested.connect(self.handle_header_view_customContextMenuRequested)
+        header.setResizeMode(QHeaderView.ResizeToContents) 
         header.setContextMenuPolicy(Qt.CustomContextMenu)
-        
+     
         #tree_widget ROBOT
         self.env_robot_tree_widget.sortByColumn(0, Qt.AscendingOrder)
         self.env_robot_tree_widget.setEditTriggers(self.env_robot_tree_widget.NoEditTriggers)
-        self.env_robot_tree_widget.itemDoubleClicked.connect(self.checkEdit)
+        self.env_robot_tree_widget.clicked.connect(self.show_click_row)
         header_robot=self.env_robot_tree_widget.header()
-        header_robot.setResizeMode(QHeaderView.ResizeToContents)
-        header_robot.customContextMenuRequested.connect(self.handle_header_view_customContextMenuRequested)
+        header_robot.setResizeMode(QHeaderView.ResizeToContents) 
         header_robot.setContextMenuPolicy(Qt.CustomContextMenu)
 
-        #clicked buttons General
-        
+        #clicked buttons General       
         
         self.btnApply.clicked.connect(self.click_btnApply) 
         #clicked buttons ROS
@@ -75,15 +72,10 @@ class EnvWidget(QWidget):
 
         #clicked buttons robots
         self.btnAddRobot.clicked.connect(self.click_btnAddRobot)
-        self.btnModifyRobot.clicked.connect(self.click_btnModifyRobot)
+        self.btnDetailsRobot.clicked.connect(self.click_btnDetailsRobot)
         self.btnSaveRobot.clicked.connect(self.click_btnSaveRobot)
         self.btnRemoveRobot.clicked.connect(self.click_btnRemoveRobot)
-        
 
-      
-
-        # Whether to get all topics or only the topics that are set in advance.
-        # Can be also set by the setter method "set_selected_topics".
         self._selected_topics = selected_topics
 
         self._current_topic_list = []
@@ -93,16 +85,7 @@ class EnvWidget(QWidget):
         for column_name in self._column_names:
             self._column_index[column_name] = len(self._column_index)
 
-       
-
-        # self.refresh_topics()
-
-        # init and start update timer
-        # self._timer_refresh_topics = QTimer(self)
-        # self._timer_refresh_topics.timeout.connect(self.refresh_topics)
-        self.refresh_topics()
-
-
+        self.refresh_env()
 
     def click_btnApply(self):
         quit_msg = "Are you sure you want to Apply this configuration?"
@@ -142,12 +125,17 @@ class EnvWidget(QWidget):
                 
     def click_btnAddRobot(self):
         print "Test click_btnAddRobot"
-        q = NewRobot()
+        q = DialogRobot()
         q.exec_()
         # sys.exit(App.exec_())
 
-    def click_btnModifyRobot(self):
-        print "Test click_btnModifyRobot"
+    def click_btnDetailsRobot(self):
+        print "Test click_btnDetailsRobot"
+        item = self.env_robot_tree_widget.currentItem()
+        print item.text(0)
+        q = DialogRobot()
+        q.txtAlias.setText(str(item.text(0)))
+        q.exec_()
 
     def click_btnSaveRobot(self):
         print "Test click_btnSaveRobot"
@@ -167,13 +155,9 @@ class EnvWidget(QWidget):
         for item in self.env_robot_tree_widget.selectedItems():
             (item.parent() or root).removeChild(item)
 
-    def checkEdit(self,item,column):
+    def show_click_row(self,item=None,column=None):
         print "item" , item
-        print "col" , column
-        if column > 0:
-            self.env_robot_tree_widget.editItem(item, column)
-
-
+        print "col" , column 
     def set_topic_specifier(self, specifier):
         self._select_topic_type = specifier
 
@@ -183,9 +167,8 @@ class EnvWidget(QWidget):
         """
         self._timer_refresh_topics.start(1000)
 
-
     # @Slot()
-    def refresh_topics(self):
+    def refresh_env(self):
         self._xml_info = XmlInfo()
         self._xml_info.openXml()
         general_list = self._xml_info.getGeneralVariables()
@@ -235,80 +218,12 @@ class EnvWidget(QWidget):
                 new_topics_robots[topic_name] = self._topics[topic_name]
                 del self._topics[topic_name]
 
-
-    def _update_topics_data(self):
-        for topic in self._topics.values():
-            topic_info = topic['info']
-            if topic_info.monitoring:
-                # update rate
-                rate, _, _, _ = topic_info.get_hz()
-                rate_text = '%1.2f' % rate if rate != None else 'unknown'
-
-                # update bandwidth
-                bytes_per_s, _, _, _ = topic_info.get_bw()
-                if bytes_per_s is None:
-                    bandwidth_text = 'unknown'
-                elif bytes_per_s < 1000:
-                    bandwidth_text = '%.2fB/s' % bytes_per_s
-                elif bytes_per_s < 1000000:
-                    bandwidth_text = '%.2fKB/s' % (bytes_per_s / 1000.)
-                else:
-                    bandwidth_text = '%.2fMB/s' % (bytes_per_s / 1000000.)
-
-                # update values
-                value_text = ''
-                self.update_value(topic_info._topic_name, topic_info.last_message)
-
-            else:
-                rate_text = ''
-                bandwidth_text = ''
-                value_text = 'not monitored' if topic_info.error is None else topic_info.error
-
-            self._tree_items[topic_info._topic_name].setText(self._column_index['rate'], rate_text)
-            self._tree_items[topic_info._topic_name].setText(self._column_index['bandwidth'], bandwidth_text)
-            self._tree_items[topic_info._topic_name].setText(self._column_index['value'], value_text)
-
-    def update_value(self, topic_name, message):
-        if hasattr(message, '__slots__') and hasattr(message, '_slot_types'):
-            for slot_name in message.__slots__:
-                self.update_value(topic_name + '/' + slot_name, getattr(message, slot_name))
-
-        elif type(message) in (list, tuple) and (len(message) > 0) and hasattr(message[0], '__slots__'):
-
-            for index, slot in enumerate(message):
-                if topic_name + '[%d]' % index in self._tree_items:
-                    self.update_value(topic_name + '[%d]' % index, slot)
-                else:
-                    base_type_str, _ = self._extract_array_info(self._tree_items[topic_name].text(self._column_index['type']))
-                    self._recursive_create_widget_items(self._tree_items[topic_name], topic_name + '[%d]' % index, base_type_str, slot)
-            # remove obsolete children
-            if len(message) < self._tree_items[topic_name].childCount():
-                for i in range(len(message), self._tree_items[topic_name].childCount()):
-                    item_topic_name = topic_name + '[%d]' % i
-                    self._recursive_delete_widget_items(self._tree_items[item_topic_name])
-        else:
-            if topic_name in self._tree_items:
-                self._tree_items[topic_name].setText(self._column_index['value'], repr(message))
-
-    def _extract_array_info(self, type_str):
-        array_size = None
-        if '[' in type_str and type_str[-1] == ']':
-            type_str, array_size_str = type_str.split('[', 1)
-            array_size_str = array_size_str[:-1]
-            if len(array_size_str) > 0:
-                array_size = int(array_size_str)
-            else:
-                array_size = 0
-
-        return type_str, array_size
     def _recursive_create_widget_items(self, parent, topic_name, type_name, message,status=None):
         topic_text = topic_name
         item = TreeWidgetItem(self._toggle_monitoring, topic_name, parent,status)
         item.setText(self._column_index['topic'], topic_text)
         item.setText(self._column_index['type'], type_name) 
         return item
-
-
     def _toggle_monitoring(self, topic_name):
         item = self._tree_items[topic_name]
         if item.checkState(0):
@@ -324,49 +239,10 @@ class EnvWidget(QWidget):
             del self._tree_items[topic_name]
         _recursive_remove_items_from_tree(item)
         item.parent().removeChild(item)
-
-    @Slot('QPoint')
-    def handle_header_view_customContextMenuRequested(self, pos):
-        header = self.env_ros_tree_widget.header()
-
-        # show context menu
-        menu = QMenu(self)
-        action_toggle_auto_resize = menu.addAction('Toggle Auto-Resize')
-        action = menu.exec_(header.mapToGlobal(pos))
-
-        # evaluate user action
-        if action is action_toggle_auto_resize:
-            if header.resizeMode(0) == QHeaderView.ResizeToContents:
-                header.setResizeMode(QHeaderView.Interactive)
-            else:
-                header.setResizeMode(QHeaderView.ResizeToContents)
-
-    @Slot('QPoint')
-    def on_env_ros_tree_widget_customContextMenuRequested(self, pos):
-        item = self.env_ros_tree_widget.itemAt(pos)
-        if item is None:
-            return
-
-        # show context menu
-        menu = QMenu(self)
-        action_item_expand = menu.addAction(QIcon.fromTheme('zoom-in'), 'Expand All Children')
-        action_item_collapse = menu.addAction(QIcon.fromTheme('zoom-out'), 'Collapse All Children')
-        action = menu.exec_(self.env_ros_tree_widget.mapToGlobal(pos))
-
-        # evaluate user action
-        if action in (action_item_expand, action_item_collapse):
-            expanded = (action is action_item_expand)
-
-            def recursive_set_expanded(item):
-                item.setExpanded(expanded)
-                for index in range(item.childCount()):
-                    recursive_set_expanded(item.child(index))
-            recursive_set_expanded(item)
-
     def shutdown_plugin(self):
         for topic in self._topics.values():
             topic['info'].stop_monitoring()
-        self._timer_refresh_topics.stop()
+        #self._timer_refresh_topics.stop()
 
     def set_selected_topics(self, selected_topics):
         """
@@ -396,7 +272,7 @@ class TreeWidgetItem(QTreeWidgetItem):
         if status == '1':
             self.setCheckState(2, Qt.Checked)
         elif status == '0':
-            self.setCheckState(2, Qt.Unchecked)   #ACA AGREGA EL CHECKBOX COMO CHECKED O UNCHECKED
+            self.setCheckState(2, Qt.Unchecked) 
 
     def setData(self, column, role, value):
         if role == Qt.CheckStateRole:

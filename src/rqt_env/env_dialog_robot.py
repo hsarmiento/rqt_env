@@ -9,9 +9,11 @@ import rospkg
 import rospy
 from rospy.exceptions import ROSException
 
-class NewRobot(QDialog):
+class DialogRobot(QDialog):
+#	_column_names_robot = ['topic', 'type', 'bandwidth', 'rate', 'value']
+
     def __init__(self, parent=None):
-        super(NewRobot,self).__init__(parent)
+        super(DialogRobot,self).__init__(parent)
 
         rp = rospkg.RosPack()
         ui_file = os.path.join(rp.get_path('rqt_env'), 'resource', 'NewRobotDialog.ui')

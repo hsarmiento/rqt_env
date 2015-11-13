@@ -130,7 +130,7 @@
     <string>Add</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lineEdit_5">
+  <widget class="QLineEdit" name="txtAlias">
    <property name="geometry">
     <rect>
      <x>80</x>

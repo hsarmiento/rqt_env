@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -202,7 +202,7 @@
       <string>Save</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="btnModifyRobot">
+    <widget class="QPushButton" name="btnDetailsRobot">
      <property name="geometry">
       <rect>
        <x>523</x>
@@ -212,7 +212,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>Modify</string>
+      <string>Details</string>
      </property>
     </widget>
     <widget class="QPushButton" name="btnRemoveRobot">

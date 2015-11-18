@@ -9,7 +9,7 @@ import roslib
 import rospkg
 import rospy
 from rospy.exceptions import ROSException
-from .env_dialog_robot import DialogRobot
+from .env_dialog_robot import DialogRobot,DialogXml
 from .xml_info import XmlInfo 
  
 
@@ -130,11 +130,8 @@ class EnvWidget(QWidget):
         # sys.exit(App.exec_())
 
     def click_btnDetailsRobot(self):
-        print "Test click_btnDetailsRobot"
         item = self.env_robot_tree_widget.currentItem()
-        print item.text(0)
-        q = DialogRobot()
-        q.txtAlias.setText(str(item.text(0)))
+        q = DialogRobot(item.text(0))
         q.exec_()
 
     def click_btnSaveRobot(self):

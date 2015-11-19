@@ -96,7 +96,16 @@ class EnvWidget(QWidget):
         for i in range(count):
             folder = root.child(i)
             folder.setCheckState(2, Qt.Unchecked)
-
+    
+    def validate_item(self, item=None):
+        root = self.env_ros_tree_widget.invisibleRootItem()
+        count = root.childCount()
+        for i in range(count):
+            row = root.child(i)
+            if(row.text(0)==item):
+                return True
+        return False
+        
 
     def click_btnApply(self):
         self.clear_checked()
@@ -110,26 +119,23 @@ class EnvWidget(QWidget):
             pass
     
    
-    def click_btn_new_ros(self):
-        print "Test Click_btnNewRos"
-        # self.btnModifyRos.setEnabled(False)
+    def click_btn_new_ros(self): 
+        self.btnSaveRos.setEnabled(True)
         # self.btnRemoveRos.setEnabled(False)
         # self.btnSaveRos.setEnabled(True)
  
   
     def click_btnSaveRos(self):
-        print "Test click_btnSaveRos"
-        # print self.txtVariableRos.text()
-        # print self.txtValueRos.text()
-        topic_info = 'ss'
-        message_instance = None
-        self._recursive_create_widget_items(self.env_ros_tree_widget, self.txtVariableRos.text(), self.txtValueRos.text(), message_instance)
-        self.btnSaveRos.setEnabled(False)
-        self.btnRemoveRos.setEnabled(True)
-        # self.btnModifyRos.setEnabled(True)
-        self.txtVariableRos.setText("")
-        self.txtValueRos.setText("")
-
+        if not self.validate_item(self.txtVariableRos.text()):
+            topic_info = 'ss'
+            message_instance = None
+            self._recursive_create_widget_items(self.env_ros_tree_widget, self.txtVariableRos.text(), self.txtValueRos.text(), message_instance)
+            self.btnSaveRos.setEnabled(False)
+            self.btnRemoveRos.setEnabled(True)
+            self.txtVariableRos.setText("")
+            self.txtValueRos.setText("")
+        else:
+             QMessageBox.information(self, 'Variable exists',self.txtVariableRos.text()+" exists in list")
 
     def click_btnRemoveRos(self):
         # 

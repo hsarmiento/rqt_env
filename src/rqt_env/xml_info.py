@@ -16,7 +16,8 @@ class XmlInfo(object):
 		l = []
 		for elem in self._root.iter(tag='general'):
 			for node in elem.iterfind('variable'):
-				l.append([node.attrib['name'],node.attrib['value']])
+				if node.attrib['deleted'] == '0':
+					l.append([node.attrib['name'],node.attrib['value']])
 		return l
 
 	def getRobots(self):

@@ -48,6 +48,7 @@ class EnvWidget(QWidget):
         self._plugin = plugin
         #tree_widget ROS
         self.env_ros_tree_widget.sortByColumn(0, Qt.AscendingOrder)
+        self.env_ros_tree_widget.clicked.connect(self.show_click_row)
       
 
         header = self.env_ros_tree_widget.header()
@@ -62,13 +63,15 @@ class EnvWidget(QWidget):
         header_robot.setResizeMode(QHeaderView.ResizeToContents) 
         header_robot.setContextMenuPolicy(Qt.CustomContextMenu)
 
-        #clicked buttons General       
+        #clicked buttons General (all window)    
         
         self.btnApply.clicked.connect(self.click_btnApply) 
+
         #clicked buttons ROS
         self.btnNewRos.clicked.connect(self.click_btn_new_ros) 
         self.btnSaveRos.clicked.connect(self.click_btnSaveRos)
         self.btnRemoveRos.clicked.connect(self.click_btnRemoveRos)
+        self.btnCancelRos.clicked.connect(self.click_btn_cancel_ros)
 
         #clicked buttons robots
         self.btnAddRobot.clicked.connect(self.click_btnAddRobot)
@@ -76,6 +79,9 @@ class EnvWidget(QWidget):
         self.btnSaveRobot.clicked.connect(self.click_btnSaveRobot)
         self.btnRemoveRobot.clicked.connect(self.click_btnRemoveRobot)
 
+        #init state general button
+        self.btnSaveRos.setEnabled(False)
+        self.btnRemoveRos.setEnabled(False)
 
 
 
@@ -89,6 +95,11 @@ class EnvWidget(QWidget):
             self._column_index[column_name] = len(self._column_index)
 
         self.refresh_env()
+
+    def show_click_row(self):
+        self.btnRemoveRos.setEnabled(True)
+        # return True
+
 
     def clear_checked(self):
         root = self.env_robot_tree_widget.invisibleRootItem()
@@ -121,21 +132,26 @@ class EnvWidget(QWidget):
    
     def click_btn_new_ros(self): 
         self.btnSaveRos.setEnabled(True)
-        # self.btnRemoveRos.setEnabled(False)
+        self.btnRemoveRos.setEnabled(False)
+        self.env_ros_tree_widget.clearSelection()
+        self.txtVariableRos.setFocus()
+
         # self.btnSaveRos.setEnabled(True)
  
   
     def click_btnSaveRos(self):
-        if not self.validate_item(self.txtVariableRos.text()):
-            topic_info = 'ss'
-            message_instance = None
-            self._recursive_create_widget_items(self.env_ros_tree_widget, self.txtVariableRos.text(), self.txtValueRos.text(), message_instance)
-            self.btnSaveRos.setEnabled(False)
-            self.btnRemoveRos.setEnabled(True)
-            self.txtVariableRos.setText("")
-            self.txtValueRos.setText("")
-        else:
-             QMessageBox.information(self, 'Variable exists',self.txtVariableRos.text()+" exists in list")
+
+        if self.txtVariableRos.text().strip() != "" and self.txtValueRos.text().strip() != "" :
+            if not self.validate_item(self.txtVariableRos.text()):
+                topic_info = 'ss'
+                message_instance = None
+                self._recursive_create_widget_items(self.env_ros_tree_widget, self.txtVariableRos.text(), self.txtValueRos.text(), message_instance)
+                self.btnSaveRos.setEnabled(False)
+                self.btnRemoveRos.setEnabled(True)
+                self.txtVariableRos.setText("")
+                self.txtValueRos.setText("")
+            else:
+                 QMessageBox.information(self, 'Variable exists',self.txtVariableRos.text()+" exists in list")
 
     def click_btnRemoveRos(self):
         # 
@@ -147,6 +163,13 @@ class EnvWidget(QWidget):
             self._recursive_delete_widget_items(self._tree_items['TURTLEBOT_BASE'])
         else:
             pass
+
+    def click_btn_cancel_ros(self):
+        self.txtVariableRos.setText("")
+        self.txtValueRos.setText("")
+        self.btnNewRos.setEnabled(True)
+        self.btnSaveRos.setEnabled(False)
+
                 
     def click_btnAddRobot(self):
         print "Test click_btnAddRobot"
@@ -177,6 +200,9 @@ class EnvWidget(QWidget):
         for item in self.env_robot_tree_widget.selectedItems():
             (item.parent() or root).removeChild(item)
  
+    def get_selected_item(self,tree_widget):
+        # root = tree_widget.invisibleRootItem()
+        print tree_widget.selectedItems()
 
     def set_topic_specifier(self, specifier):
         self._select_topic_type = specifier

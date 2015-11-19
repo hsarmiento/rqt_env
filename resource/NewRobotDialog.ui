@@ -94,7 +94,7 @@
   <widget class="QPushButton" name="btnRemoveRobot">
    <property name="geometry">
     <rect>
-     <x>477</x>
+     <x>200</x>
      <y>400</y>
      <width>91</width>
      <height>30</height>
@@ -151,6 +151,19 @@
    </property>
    <property name="text">
     <string>Alias</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btnCancelRobot">
+   <property name="geometry">
+    <rect>
+     <x>480</x>
+     <y>400</y>
+     <width>81</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Cancel</string>
    </property>
   </widget>
  </widget>

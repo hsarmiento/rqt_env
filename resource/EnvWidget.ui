@@ -58,7 +58,7 @@
     <widget class="QPushButton" name="btnRemoveRos">
      <property name="geometry">
       <rect>
-       <x>697</x>
+       <x>420</x>
        <y>420</y>
        <width>91</width>
        <height>30</height>
@@ -140,6 +140,19 @@
       <string>Value</string>
      </property>
     </widget>
+    <widget class="QPushButton" name="btnCancelRos">
+     <property name="geometry">
+      <rect>
+       <x>700</x>
+       <y>420</y>
+       <width>81</width>
+       <height>30</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Cancel</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QWidget" name="tab_2">
     <attribute name="title">
@@ -218,7 +231,7 @@
     <widget class="QPushButton" name="btnRemoveRobot">
      <property name="geometry">
       <rect>
-       <x>700</x>
+       <x>330</x>
        <y>420</y>
        <width>91</width>
        <height>30</height>
@@ -226,6 +239,19 @@
      </property>
      <property name="text">
       <string>Remove</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btnCancelRobot">
+     <property name="geometry">
+      <rect>
+       <x>700</x>
+       <y>420</y>
+       <width>81</width>
+       <height>30</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Cancel</string>
      </property>
     </widget>
    </widget>

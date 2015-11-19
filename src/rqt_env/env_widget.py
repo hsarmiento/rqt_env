@@ -66,7 +66,7 @@ class EnvWidget(QWidget):
         
         self.btnApply.clicked.connect(self.click_btnApply) 
         #clicked buttons ROS
-        self.btnNewRos.clicked.connect(self.click_btnNewRos) 
+        self.btnNewRos.clicked.connect(self.click_btn_new_ros) 
         self.btnSaveRos.clicked.connect(self.click_btnSaveRos)
         self.btnRemoveRos.clicked.connect(self.click_btnRemoveRos)
 
@@ -75,6 +75,9 @@ class EnvWidget(QWidget):
         self.btnDetailsRobot.clicked.connect(self.click_btnDetailsRobot)
         self.btnSaveRobot.clicked.connect(self.click_btnSaveRobot)
         self.btnRemoveRobot.clicked.connect(self.click_btnRemoveRobot)
+
+
+
 
         self._selected_topics = selected_topics
 
@@ -98,11 +101,16 @@ class EnvWidget(QWidget):
             pass
     
    
-    def click_btnNewRos(self):
+    def click_btn_new_ros(self):
         print "Test Click_btnNewRos"
-        self.btnModifyRos.setEnabled(False)
-        self.btnRemoveRos.setEnabled(False)
-        self.btnSaveRos.setEnabled(True)
+        print self.lineEdit_3.text()
+        print self.lineEdit_4.text()
+        topic_info = 'ss'
+        message_instance = None
+        self._recursive_create_widget_items(self.env_ros_tree_widget, self.lineEdit_3.text(), self.lineEdit_4.text(), message_instance)
+        # self.btnModifyRos.setEnabled(False)
+        # self.btnRemoveRos.setEnabled(False)
+        # self.btnSaveRos.setEnabled(True)
  
   
     def click_btnSaveRos(self):
@@ -235,7 +243,7 @@ class EnvWidget(QWidget):
             del self._tree_items[topic_name]
         _recursive_remove_items_from_tree(item)
         item.parent().removeChild(item)
-        
+
     def shutdown_plugin(self):
         for topic in self._topics.values():
             topic['info'].stop_monitoring()

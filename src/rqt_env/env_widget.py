@@ -112,11 +112,6 @@ class EnvWidget(QWidget):
    
     def click_btn_new_ros(self):
         print "Test Click_btnNewRos"
-        print self.lineEdit_3.text()
-        print self.lineEdit_4.text()
-        topic_info = 'ss'
-        message_instance = None
-        self._recursive_create_widget_items(self.env_ros_tree_widget, self.lineEdit_3.text(), self.lineEdit_4.text(), message_instance)
         # self.btnModifyRos.setEnabled(False)
         # self.btnRemoveRos.setEnabled(False)
         # self.btnSaveRos.setEnabled(True)
@@ -124,9 +119,16 @@ class EnvWidget(QWidget):
   
     def click_btnSaveRos(self):
         print "Test click_btnSaveRos"
+        # print self.txtVariableRos.text()
+        # print self.txtValueRos.text()
+        topic_info = 'ss'
+        message_instance = None
+        self._recursive_create_widget_items(self.env_ros_tree_widget, self.txtVariableRos.text(), self.txtValueRos.text(), message_instance)
         self.btnSaveRos.setEnabled(False)
         self.btnRemoveRos.setEnabled(True)
-        self.btnModifyRos.setEnabled(True)
+        # self.btnModifyRos.setEnabled(True)
+        self.txtVariableRos.setText("")
+        self.txtValueRos.setText("")
 
 
     def click_btnRemoveRos(self):
@@ -136,7 +138,7 @@ class EnvWidget(QWidget):
         reply = QMessageBox.question(self, 'Message', quit_msg, QMessageBox.Yes, QMessageBox.No)
 
         if reply == QMessageBox.Yes:
-            self._recursive_delete_widget_items(self._tree_items[self.env_robot_tree_widget.currentItem()])
+            self._recursive_delete_widget_items(self._tree_items['TURTLEBOT_BASE'])
         else:
             pass
                 

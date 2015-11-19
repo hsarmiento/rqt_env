@@ -3,7 +3,7 @@ from __future__ import division
 import os
 from python_qt_binding import loadUi
 from python_qt_binding.QtCore import Qt, QTimer, Signal, Slot
-from python_qt_binding.QtGui import QHeaderView, QIcon, QMenu, QTreeWidgetItem, QWidget, QPushButton, QDialog
+from python_qt_binding.QtGui import QHeaderView, QIcon, QMenu, QTreeWidgetItem, QWidget, QPushButton, QDialog, QMessageBox
 import roslib
 import rospkg
 import rospy
@@ -25,6 +25,7 @@ class DialogRobot(QDialog):
 		header_robot=self.treeWidget.header()
 		header_robot.setResizeMode(QHeaderView.ResizeToContents) 
 		header_robot.setContextMenuPolicy(Qt.CustomContextMenu)
+		# self.btnRemoveRobot.clicked.connect(self.click_btnRemoveRobot)
 		self.txtAlias.setText(self._alias)
 		
 		if alias != None:
@@ -65,7 +66,7 @@ class DialogRobot(QDialog):
 	    item.setText(self._column_index['variable'], topic_text)
 	    item.setText(self._column_index['value'], variable_value) 
 	    return item
-
+ 
 
 class TreeWidgetItem(QTreeWidgetItem):
     def __init__(self, topic_name, parent=None):

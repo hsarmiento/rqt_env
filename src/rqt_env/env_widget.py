@@ -48,7 +48,7 @@ class EnvWidget(QWidget):
         self._plugin = plugin
         #tree_widget ROS
         self.env_ros_tree_widget.sortByColumn(0, Qt.AscendingOrder)
-        self.env_ros_tree_widget.clicked.connect(self.show_click_row)
+      
 
         header = self.env_ros_tree_widget.header()
         header.setResizeMode(QHeaderView.ResizeToContents) 
@@ -57,7 +57,7 @@ class EnvWidget(QWidget):
         #tree_widget ROBOT
         self.env_robot_tree_widget.sortByColumn(0, Qt.AscendingOrder)
         self.env_robot_tree_widget.setEditTriggers(self.env_robot_tree_widget.NoEditTriggers)
-        self.env_robot_tree_widget.clicked.connect(self.show_click_row)
+        
         header_robot=self.env_robot_tree_widget.header()
         header_robot.setResizeMode(QHeaderView.ResizeToContents) 
         header_robot.setContextMenuPolicy(Qt.CustomContextMenu)
@@ -90,7 +90,16 @@ class EnvWidget(QWidget):
 
         self.refresh_env()
 
+    def clear_checked(self):
+        root = self.env_robot_tree_widget.invisibleRootItem()
+        count = root.childCount()
+        for i in range(count):
+            folder = root.child(i)
+            folder.setCheckState(2, Qt.Unchecked)
+
+
     def click_btnApply(self):
+        self.clear_checked()
         quit_msg = "Are you sure you want to Apply this configuration?"
         reply = QMessageBox.question(self, 'Message', quit_msg, QMessageBox.Yes, QMessageBox.No)
 
@@ -127,7 +136,7 @@ class EnvWidget(QWidget):
         reply = QMessageBox.question(self, 'Message', quit_msg, QMessageBox.Yes, QMessageBox.No)
 
         if reply == QMessageBox.Yes:
-            self._recursive_delete_widget_items(self._tree_items['TURTLEBOT_BASE'])
+            self._recursive_delete_widget_items(self._tree_items[self.env_robot_tree_widget.currentItem()])
         else:
             pass
                 
@@ -159,10 +168,8 @@ class EnvWidget(QWidget):
         root = self.env_robot_tree_widget.invisibleRootItem()
         for item in self.env_robot_tree_widget.selectedItems():
             (item.parent() or root).removeChild(item)
+ 
 
-    def show_click_row(self,item=None,column=None):
-        print "item" , item
-        print "col" , column 
     def set_topic_specifier(self, specifier):
         self._select_topic_type = specifier
 
@@ -222,6 +229,7 @@ class EnvWidget(QWidget):
                 del self._topics[topic_name]
 
     def _recursive_create_widget_items(self, parent, topic_name, type_name, message,status=None):
+        
         topic_text = topic_name
         item = TreeWidgetItem(self._toggle_monitoring, topic_name, parent,status)
         item.setText(self._column_index['topic'], topic_text)
@@ -229,6 +237,7 @@ class EnvWidget(QWidget):
         return item
 
     def _toggle_monitoring(self, topic_name):
+        print "ckeck"
         item = self._tree_items[topic_name]
         if item.checkState(0):
             self._topics[topic_name]['info'].start_monitoring()
@@ -238,12 +247,14 @@ class EnvWidget(QWidget):
     def _recursive_delete_widget_items(self, item):
         def _recursive_remove_items_from_tree(item):
             for index in reversed(range(item.childCount())):
+                print "item ",item.childCount()
                 _recursive_remove_items_from_tree(item.child(index))
             topic_name = item.data(0, Qt.UserRole)
             del self._tree_items[topic_name]
         _recursive_remove_items_from_tree(item)
         item.parent().removeChild(item)
 
+   
     def shutdown_plugin(self):
         for topic in self._topics.values():
             topic['info'].stop_monitoring()
@@ -283,8 +294,10 @@ class TreeWidgetItem(QTreeWidgetItem):
         if role == Qt.CheckStateRole:
             state = self.checkState(column)
         super(TreeWidgetItem, self).setData(column, role, value)
-        if role == Qt.CheckStateRole and state != self.checkState(column):
-            self._check_state_changed_callback(self._topic_name)
+       # print "role", Qt.CheckStateRole
+        #print "self._topic_name", self._topic_name
+        #if role == Qt.CheckStateRole and state != self.checkState(column):
+         #   self._check_state_changed_callback(self._topic_name)
 
 
 

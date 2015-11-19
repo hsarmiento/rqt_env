@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import xml.etree.ElementTree as ET
 import os
 import sys
@@ -11,13 +12,6 @@ class XmlInfo(object):
 		cpath = os.path.dirname(os.path.abspath(sys.argv[0]))+'/../resource/env.xml' 
 		self._root = ET.parse(cpath).getroot()
 
-	def getRobots(self):
-		l = []
-		for elem in self._root.iter(tag='robot'):
-			for node in elem.iterfind('variable'):
-				l.append([node.attrib['name'],node.attrib['value']])
-		return l
-
 	def getGeneralVariables(self):
 		l = []
 		for elem in self._root.iter(tag='general'):
@@ -28,9 +22,10 @@ class XmlInfo(object):
 	def getRobots(self):
 		l = []
 		for elem in self._root.iter(tag='robot'):
-			for node in elem.iterfind('variable'):
-				if node.attrib['name'] == 'ROS_MASTER_URI':
-					l.append([elem.attrib['id'],node.attrib['value'],elem.attrib['status']])
+			if elem.attrib['deleted'] == '0':
+				for node in elem.iterfind('variable'):
+					if node.attrib['name'] == 'ROS_MASTER_URI':
+						l.append([elem.attrib['id'],node.attrib['value'],elem.attrib['status']])
 		return l
 		
 	def removeGeneralVariable(self):

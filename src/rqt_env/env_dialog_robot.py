@@ -74,7 +74,6 @@ class TreeWidgetItem(QTreeWidgetItem):
 
 
 class DialogXml(object):
-	
 	def __init__(self):
 		self._root = None
 

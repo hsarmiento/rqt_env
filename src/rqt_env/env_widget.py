@@ -170,7 +170,6 @@ class EnvWidget(QWidget):
         self._xml_info.openXml()
         general_list = self._xml_info.getGeneralVariables()
         robots_list = self._xml_info.getRobots()
-        print robots_list
         # topic_list= [['TURTLEBOT_BASE', 'kobuki'], ['ROS_HOSTNAME', 'localhost']]
         new_topics = {}
         for topic_name, topic_type in general_list:
@@ -207,7 +206,6 @@ class EnvWidget(QWidget):
                    'info': topic_info,
                    'type': topic_type,
                 }
-                print topic_item
 
             else:
                 # if topic has been seen before, copy it to new dict and
@@ -221,6 +219,7 @@ class EnvWidget(QWidget):
         item.setText(self._column_index['topic'], topic_text)
         item.setText(self._column_index['type'], type_name) 
         return item
+
     def _toggle_monitoring(self, topic_name):
         item = self._tree_items[topic_name]
         if item.checkState(0):
@@ -236,6 +235,7 @@ class EnvWidget(QWidget):
             del self._tree_items[topic_name]
         _recursive_remove_items_from_tree(item)
         item.parent().removeChild(item)
+        
     def shutdown_plugin(self):
         for topic in self._topics.values():
             topic['info'].stop_monitoring()

@@ -19,22 +19,52 @@ class DialogRobot(QDialog):
 		rp = rospkg.RosPack()
 		ui_file = os.path.join(rp.get_path('rqt_env'), 'resource', 'NewRobotDialog.ui')
 		loadUi(ui_file, self)
-		self.treeWidget.sortByColumn(0, Qt.AscendingOrder)
-		self.treeWidget.setEditTriggers(self.treeWidget.NoEditTriggers)
+		self.treeWidgetRobot.sortByColumn(0, Qt.AscendingOrder)
+		self.treeWidgetRobot.setEditTriggers(self.treeWidgetRobot.NoEditTriggers)
 		# self.treeWidget.clicked.connect(self.show_click_row)
-		header_robot=self.treeWidget.header()
+		header_robot=self.treeWidgetRobot.header()
 		header_robot.setResizeMode(QHeaderView.ResizeToContents) 
 		header_robot.setContextMenuPolicy(Qt.CustomContextMenu)
 		# self.btnRemoveRobot.clicked.connect(self.click_btnRemoveRobot)
 		self.txtAlias.setText(self._alias)
-		
-		if alias != None:
-			self._column_index = {}
-			self._variables = {}
-			print self._column_names_robot 
-			for column_name in self._column_names_robot:
-				self._column_index[column_name] = len(self._column_index)
-	        self.refresh_variables()
+
+		#clicked buttons robots
+		self.btnAddRobot.clicked.connect(self.click_btn_add_robot)
+		self.btnSaveRobot.clicked.connect(self.click_btnSaveRobot)
+		self.btnRemoveRobot.clicked.connect(self.click_btnRemoveRobot)
+		self.btnCancelRobot.clicked.connect(self.click_btnCancelRobot)
+
+		#initial button state
+		self.btnSaveRobot.setEnabled(False)
+		self.btnRemoveRobot.setEnabled(False)
+		self.txtVariableRobot.setEnabled(False)
+		self.txtValueRobot.setEnabled(False)
+		self._column_index = {}
+		self._variables = {}
+		for column_name in self._column_names_robot:
+			self._column_index[column_name] = len(self._column_index)
+		self.refresh_variables()
+
+
+	def click_btn_add_robot(self):
+		self.btnAddRobot.setEnabled(False)
+		self.txtVariableRobot.setEnabled(True)
+		self.txtValueRobot.setEnabled(True)
+		self.btnSaveRobot.setEnabled(True)
+		self.btnRemoveRobot.setEnabled(False)
+		self.treeWidgetRobot.clearSelection()
+		self.txtVariableRobot.setFocus()
+
+	def click_btnSaveRobot(self):
+		message_instance = None
+		variable_item = self._recursive_create_widget_items(self.treeWidgetRobot, self.txtVariableRobot.text(), self.txtValueRobot.text(), message_instance)
+
+	def click_btnRemoveRobot(self):
+		pass
+
+	def click_btnCancelRobot(self):
+		pass
+
 
 	def refresh_variables(self):
 	    xml_dialog = DialogXml()
@@ -48,7 +78,7 @@ class DialogRobot(QDialog):
 	            # create new TopicInfo
 	            topic_info = 'ss'#opicInfo(topic_name, topic_type)
 	            message_instance = None
-	            variable_item = self._recursive_create_widget_items(self.treeWidget, variable_name, variable_value, message_instance)
+	            variable_item = self._recursive_create_widget_items(self.treeWidgetRobot, variable_name, variable_value, message_instance)
 	            new_topics[variable_name] = {
 	               'item': variable_item,
 	               'value': variable_value,
@@ -61,9 +91,10 @@ class DialogRobot(QDialog):
 	            del self._topics[variable_name]
 
 	def _recursive_create_widget_items(self, parent, variable_name, variable_value, message):
-	    topic_text = variable_name
+	    # topic_text = variable_name
+	    print variable_name,variable_value
 	    item = TreeWidgetItem(variable_name, parent)
-	    item.setText(self._column_index['variable'], topic_text)
+	    item.setText(self._column_index['variable'], variable_name)
 	    item.setText(self._column_index['value'], variable_value) 
 	    return item
  

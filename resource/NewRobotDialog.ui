@@ -30,7 +30,7 @@
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="QTreeWidget" name="treeWidget">
+     <widget class="QTreeWidget" name="treeWidgetRobot">
       <column>
        <property name="text">
         <string>Variable</string>
@@ -45,7 +45,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QLineEdit" name="lineEdit_4">
+  <widget class="QLineEdit" name="txtValueRobot">
    <property name="geometry">
     <rect>
      <x>120</x>
@@ -55,7 +55,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lineEdit_3">
+  <widget class="QLineEdit" name="txtVariableRobot">
    <property name="geometry">
     <rect>
      <x>120</x>

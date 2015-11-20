@@ -56,15 +56,48 @@ class DialogRobot(QDialog):
 		self.txtVariableRobot.setFocus()
 
 	def click_btnSaveRobot(self):
-		message_instance = None
-		variable_item = self._recursive_create_widget_items(self.treeWidgetRobot, self.txtVariableRobot.text(), self.txtValueRobot.text(), message_instance)
+		if self.txtAlias.text().strip() != "":
+			if self.txtVariableRobot.text().strip() != "" and self.txtValueRobot.text().strip() != "" :
+			    if not self.validate_item(self.txtVariableRobot.text()):
+			        # xml_info = XmlInfo()
+			        # xml_info.add_variable_ros(self.txtVariableRos.text(),self.txtValueRos.text())
+					message_instance = None
+					variable_item = self._recursive_create_widget_items(self.treeWidgetRobot, self.txtVariableRobot.text(), self.txtValueRobot.text(), message_instance)
+					self.btnSaveRobot.setEnabled(False)
+					self.btnRemoveRobot.setEnabled(True)
+					self.txtVariableRobot.setText("")
+					self.txtValueRobot.setText("")
+					self.txtVariableRobot.setEnabled(False)
+					self.txtValueRobot.setEnabled(False)
+					self.btnRemoveRobot.setEnabled(False)
+					self.btnAddRobot.setEnabled(True)
+					self.btnAddRobot.setFocus()
+			    else:
+			         QMessageBox.information(self, 'Variable exists',self.txtVariableRobot.text()+" exists in list")
+		else:
+			QMessageBox.information(self, 'Alias is empty',"Please, insert a value for alias")
+			self.txtAlias.setFocus()
 
 	def click_btnRemoveRobot(self):
 		pass
 
 	def click_btnCancelRobot(self):
-		pass
+		self.txtVariableRobot.setText("")
+		self.txtValueRobot.setText("")
+		self.btnSaveRobot.setEnabled(False)
+		self.btnRemoveRobot.setEnabled(False)
+		self.txtVariableRobot.setEnabled(False)
+		self.txtValueRobot.setEnabled(False)
 
+
+	def validate_item(self, item=None):
+		root = self.treeWidgetRobot.invisibleRootItem()
+		count = root.childCount()
+		for i in range(count):
+		    row = root.child(i)
+		    if(row.text(0)==item):
+		        return True
+		return False
 
 	def refresh_variables(self):
 	    xml_dialog = DialogXml()

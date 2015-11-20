@@ -2,6 +2,7 @@
 import xml.etree.ElementTree as ET
 import os
 import sys
+from xml.dom import minidom
 
 class XmlInfo(object):
 	
@@ -35,6 +36,21 @@ class XmlInfo(object):
 		 	if rank > 50:
 		 		root.remove(country)
 		 		tree.write('output.xml')
+
+	def add_variable_ros(self,variable,value):
+		self.openXml()
+		for child in self._root:
+			if child.tag == "general":
+					new_element = ET.Element('variable',{'name':variable,'value':value,'deleted':'0'})
+					child.append(new_element)
+		cpath = os.path.dirname(os.path.abspath(sys.argv[0]))+'/../resource/env.xml'
+		ET.ElementTree(self._root).write(cpath)
+		xml = minidom.parse(cpath)
+		pretty_xml_as_string = xml.toprettyxml()
+		f = open(cpath,'w')
+		f.write(pretty_xml_as_string)
+		f.close()
+
 
 
 

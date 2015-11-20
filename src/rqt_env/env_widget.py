@@ -135,6 +135,7 @@ class EnvWidget(QWidget):
     
    
     def click_btn_new_ros(self): 
+        self.btnNewRos.setEnabled(False)
         self.txtVariableRos.setEnabled(True)
         self.txtValueRos.setEnabled(True)
         self.btnSaveRos.setEnabled(True)
@@ -142,13 +143,14 @@ class EnvWidget(QWidget):
         self.env_ros_tree_widget.clearSelection()
         self.txtVariableRos.setFocus()
 
-        # self.btnSaveRos.setEnabled(True)
  
   
     def click_btnSaveRos(self):
 
         if self.txtVariableRos.text().strip() != "" and self.txtValueRos.text().strip() != "" :
             if not self.validate_item(self.txtVariableRos.text()):
+                xml_info = XmlInfo()
+                xml_info.add_variable_ros(self.txtVariableRos.text(),self.txtValueRos.text())
                 topic_info = 'ss'
                 message_instance = None
                 self._recursive_create_widget_items(self.env_ros_tree_widget, self.txtVariableRos.text(), self.txtValueRos.text(), message_instance)
@@ -156,6 +158,9 @@ class EnvWidget(QWidget):
                 self.btnRemoveRos.setEnabled(True)
                 self.txtVariableRos.setText("")
                 self.txtValueRos.setText("")
+                self.txtVariableRos.setEnabled(False)
+                self.txtValueRos.setEnabled(False)
+                self.btnRemoveRos.setEnabled(False)
             else:
                  QMessageBox.information(self, 'Variable exists',self.txtVariableRos.text()+" exists in list")
 
@@ -175,6 +180,8 @@ class EnvWidget(QWidget):
         self.txtValueRos.setText("")
         self.btnNewRos.setEnabled(True)
         self.btnSaveRos.setEnabled(False)
+        self.txtVariableRos.setEnabled(False)
+        self.txtValueRos.setEnabled(False)
 
                 
     def click_btnAddRobot(self):
@@ -190,6 +197,7 @@ class EnvWidget(QWidget):
 
     def click_btnSaveRobot(self):
         print "Test click_btnSaveRobot"
+
 
     def click_btnRemoveRobot(self):
         print "Test click_btnRemoveRobot"

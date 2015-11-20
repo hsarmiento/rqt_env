@@ -102,6 +102,9 @@ class EnvWidget(QWidget):
         self.btnRemoveRos.setEnabled(True)
         self.txtVariableRos.setEnabled(True)
         self.txtValueRos.setEnabled(True)
+        item = self.env_ros_tree_widget.currentItem()
+        self.txtVariableRos.setText(item.text(0))
+        self.txtValueRos.setText(item.text(1))
         # return True
 
 
@@ -169,9 +172,10 @@ class EnvWidget(QWidget):
         print "Test click_btnRemoveRos s"
         quit_msg = "Are you sure you want to remove this element?"
         reply = QMessageBox.question(self, 'Message', quit_msg, QMessageBox.Yes, QMessageBox.No)
-
+        item = self.env_ros_tree_widget.currentItem()
+        print "delete ", item.text(0)
         if reply == QMessageBox.Yes:
-            self._recursive_delete_widget_items(self._tree_items['TURTLEBOT_BASE'])
+            self.remove_Selected_Item_WidgetTree_ros()
         else:
             pass
 
@@ -208,6 +212,11 @@ class EnvWidget(QWidget):
             self.removeSelectedItemWidgetTree()
         else:
             pass
+
+    def remove_Selected_Item_WidgetTree_ros(self):
+        root = self.env_ros_tree_widget.invisibleRootItem()
+        for item in self.env_ros_tree_widget.selectedItems():
+            (item.parent() or root).removeChild(item)
 
     def removeSelectedItemWidgetTree(self):
         root = self.env_robot_tree_widget.invisibleRootItem()

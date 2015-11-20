@@ -82,6 +82,8 @@ class EnvWidget(QWidget):
         #init state general button
         self.btnSaveRos.setEnabled(False)
         self.btnRemoveRos.setEnabled(False)
+        self.txtVariableRos.setEnabled(False)
+        self.txtValueRos.setEnabled(False)
 
 
 
@@ -98,6 +100,8 @@ class EnvWidget(QWidget):
 
     def show_click_row(self):
         self.btnRemoveRos.setEnabled(True)
+        self.txtVariableRos.setEnabled(True)
+        self.txtValueRos.setEnabled(True)
         # return True
 
 
@@ -131,6 +135,8 @@ class EnvWidget(QWidget):
     
    
     def click_btn_new_ros(self): 
+        self.txtVariableRos.setEnabled(True)
+        self.txtValueRos.setEnabled(True)
         self.btnSaveRos.setEnabled(True)
         self.btnRemoveRos.setEnabled(False)
         self.env_ros_tree_widget.clearSelection()

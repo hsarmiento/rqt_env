@@ -10,6 +10,7 @@ import rospy
 from rospy.exceptions import ROSException
 import xml.etree.ElementTree as ET
 import sys
+from .xml_info import XmlInfo 
 
 class DialogRobot(QDialog):
 	_column_names_robot = ['variable', 'value']
@@ -59,19 +60,19 @@ class DialogRobot(QDialog):
 		if self.txtAlias.text().strip() != "":
 			if self.txtVariableRobot.text().strip() != "" and self.txtValueRobot.text().strip() != "" :
 			    if not self.validate_item(self.txtVariableRobot.text()):
-			        # xml_info = XmlInfo()
-			        # xml_info.add_variable_ros(self.txtVariableRos.text(),self.txtValueRos.text())
-					message_instance = None
-					variable_item = self._recursive_create_widget_items(self.treeWidgetRobot, self.txtVariableRobot.text(), self.txtValueRobot.text(), message_instance)
-					self.btnSaveRobot.setEnabled(False)
-					self.btnRemoveRobot.setEnabled(True)
-					self.txtVariableRobot.setText("")
-					self.txtValueRobot.setText("")
-					self.txtVariableRobot.setEnabled(False)
-					self.txtValueRobot.setEnabled(False)
-					self.btnRemoveRobot.setEnabled(False)
-					self.btnAddRobot.setEnabled(True)
-					self.btnAddRobot.setFocus()
+			    	xml_info = XmlInfo()
+			    	xml_info.add_variable_robot(self.txtAlias.text().strip(),self.txtVariableRobot.text(),self.txtValueRobot.text())
+			    	message_instance = None
+			    	variable_item = self._recursive_create_widget_items(self.treeWidgetRobot, self.txtVariableRobot.text(), self.txtValueRobot.text(), message_instance)
+			    	self.btnSaveRobot.setEnabled(False)
+			    	self.btnRemoveRobot.setEnabled(True)
+			    	self.txtVariableRobot.setText("")
+			    	self.txtValueRobot.setText("")
+			    	self.txtVariableRobot.setEnabled(False)
+			    	self.txtValueRobot.setEnabled(False)
+			    	self.btnRemoveRobot.setEnabled(False)
+			    	self.btnAddRobot.setEnabled(True)
+			    	self.btnAddRobot.setFocus()
 			    else:
 			         QMessageBox.information(self, 'Variable exists',self.txtVariableRobot.text()+" exists in list")
 		else:

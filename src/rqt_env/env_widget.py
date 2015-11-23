@@ -196,8 +196,10 @@ class EnvWidget(QWidget):
 
     def click_btnDetailsRobot(self):
         item = self.env_robot_tree_widget.currentItem()
-        q = DialogRobot(item.text(0))
-        q.exec_()
+        print "item",item
+        if not item==None:
+            q = DialogRobot(item.text(0))
+            q.exec_()
 
     def click_btnSaveRobot(self):
         print "Test click_btnSaveRobot"

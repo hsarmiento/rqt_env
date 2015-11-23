@@ -11,6 +11,7 @@ from rospy.exceptions import ROSException
 import xml.etree.ElementTree as ET
 import sys
 from .xml_info import XmlInfo 
+from xml.dom import minidom
 
 class DialogRobot(QDialog):
 	_column_names_robot = ['variable', 'value']
@@ -22,6 +23,9 @@ class DialogRobot(QDialog):
 		loadUi(ui_file, self)
 		self.treeWidgetRobot.sortByColumn(0, Qt.AscendingOrder)
 		self.treeWidgetRobot.setEditTriggers(self.treeWidgetRobot.NoEditTriggers)
+		# self.treeWidgetRobot.clicked.connect(self.show_click_row)
+ 
+ 
 		# self.treeWidget.clicked.connect(self.show_click_row)
 		header_robot=self.treeWidgetRobot.header()
 		header_robot.setResizeMode(QHeaderView.ResizeToContents) 
@@ -46,6 +50,13 @@ class DialogRobot(QDialog):
 			self._column_index[column_name] = len(self._column_index)
 		self.refresh_variables()
 
+  # def show_click_row(self):
+  #       self.btnRemoveRobot.setEnabled(True)
+  #       self.txtVariableRobot.setEnabled(True)
+  #       self.txtValueRobot.setEnabled(True)
+  #       item = self.treeWidgetRobot.currentItem()
+  #       self.txtVariableRobot.setText(item.text(0))
+  #       self.txtValueRobot.setText(item.text(1))
 
 	def click_btn_add_robot(self):
 		self.btnAddRobot.setEnabled(False)
@@ -60,8 +71,8 @@ class DialogRobot(QDialog):
 		if self.txtAlias.text().strip() != "":
 			if self.txtVariableRobot.text().strip() != "" and self.txtValueRobot.text().strip() != "" :
 			    if not self.validate_item(self.txtVariableRobot.text()):
-			    	xml_info = XmlInfo()
-			    	xml_info.add_variable_robot(self.txtAlias.text().strip(),self.txtVariableRobot.text(),self.txtValueRobot.text())
+			    	dialog_xml = DialogXml()
+			    	dialog_xml.add_variable_robot(self.txtAlias.text().strip(),self.txtVariableRobot.text(),self.txtValueRobot.text())
 			    	message_instance = None
 			    	variable_item = self._recursive_create_widget_items(self.treeWidgetRobot, self.txtVariableRobot.text(), self.txtValueRobot.text(), message_instance)
 			    	self.btnSaveRobot.setEnabled(False)
@@ -154,5 +165,28 @@ class DialogXml(object):
 				for node in elem.iterfind('variable'):
 					l.append([node.attrib['name'],node.attrib['value']])
 		return l
+
+	def add_variable_robot(self,alias,variable,value):
+		self.openXml()
+		is_new = True
+		for elem in self._root.iter(tag='robot'):
+			if elem.attrib['id'] == alias:
+				new_element = ET.Element('variable',{'name':variable,'value':value,'deleted':'0'})
+				elem.append(new_element)
+				is_new = False
+		if is_new:		
+			for child in self._root:
+				if child.tag == "robots":
+						new_element = ET.Element('robot',{'id':alias,'status':'1','deleted':'0'})
+						subElem = ET.SubElement(new_element, "variable", {'deleted':'0','name':variable,'value':value})
+						ET.dump(new_element)
+						child.append(new_element)
+		cpath = os.path.dirname(os.path.abspath(sys.argv[0]))+'/../resource/env.xml'
+		ET.ElementTree(self._root).write(cpath)
+		xml = minidom.parse(cpath)
+		pretty_xml_as_string = xml.toprettyxml()
+		f = open(cpath,'w')
+		f.write(pretty_xml_as_string)
+		f.close()
 
 

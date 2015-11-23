@@ -36,24 +36,6 @@ class XmlInfo(object):
 		 	if rank > 50:
 		 		root.remove(country)
 		 		tree.write('output.xml')
-	
-	def add_variable_robot(self,alias,variable,value):
-		self.openXml()
-		for child in self._root:
-			if child.tag == "robots":
-					new_element = ET.Element('robot',{'id':variable,'status':'1','deleted':'0'})
-					subElem = ET.SubElement(new_element, "variable", {'deleted':'0','name':variable,'value':value})
-					ET.dump(new_element)
-					child.append(new_element)
-		cpath = os.path.dirname(os.path.abspath(sys.argv[0]))+'/../resource/env.xml'
-		ET.ElementTree(self._root).write(cpath)
-		xml = minidom.parse(cpath)
-		pretty_xml_as_string = xml.toprettyxml()
-		f = open(cpath,'w')
-		f.write(pretty_xml_as_string)
-		f.close()
-
-	 
 
 	def add_variable_ros(self,variable,value):
 		self.openXml()

@@ -13,6 +13,7 @@ import sys
 from .xml_info import XmlInfo 
 from xml.dom import minidom
 from PyQt4.QtCore import SIGNAL, QObject
+from urlparse import urlparse
 
 class DialogRobot(QDialog):
 	_column_names_robot = ['variable', 'value']
@@ -80,6 +81,19 @@ class DialogRobot(QDialog):
 	        	hostname = True
 	    return (uri,hostname)
 
+
+  	def validate_ip(self,s):
+	    a = s.split('.')
+	    if len(a) != 4:
+	        return False
+	    for x in a:
+	        if not x.isdigit():
+	            return False
+	        i = int(x)
+	        if i < 0 or i > 255:
+	            return False
+	    return True
+
   # def show_click_row(self):
   #       self.btnRemoveRobot.setEnabled(True)
   #       self.txtVariableRobot.setEnabled(True)
@@ -98,22 +112,29 @@ class DialogRobot(QDialog):
 		self.txtVariableRobot.setFocus()
 
 	def click_btnSaveRobot(self):
+		save = True
 		if self.txtAlias.text().strip() != "":
 			if self.txtVariableRobot.text().strip() != "" and self.txtValueRobot.text().strip() != "" :
 			    if not self.validate_item(self.txtVariableRobot.text()):
-			    	dialog_xml = DialogXml()
-			    	dialog_xml.add_variable_robot(self.txtAlias.text().strip(),self.txtVariableRobot.text(),self.txtValueRobot.text())
-			    	message_instance = None
-			    	variable_item = self._recursive_create_widget_items(self.treeWidgetRobot, self.txtVariableRobot.text(), self.txtValueRobot.text(), message_instance)
-			    	self.btnSaveRobot.setEnabled(False)
-			    	self.btnRemoveRobot.setEnabled(True)
-			    	self.txtVariableRobot.setText("")
-			    	self.txtValueRobot.setText("")
-			    	self.txtVariableRobot.setEnabled(False)
-			    	self.txtValueRobot.setEnabled(False)
-			    	self.btnRemoveRobot.setEnabled(False)
-			    	self.btnAddRobot.setEnabled(True)
-			    	self.btnAddRobot.setFocus()
+			    	if self.txtVariableRobot.text() == 'ROS_MASTER_URI':
+		    			parse = urlparse(self.txtValueRobot.text())
+			    		if not self.validate_ip(parse.netloc.split(':')[0]):
+		    				save = False
+		    				QMessageBox.information(self, 'ROS_MASTER_URI format',"ROS_MASTER_URI must has http://")
+			    	if save:
+				    	dialog_xml = DialogXml()
+				    	dialog_xml.add_variable_robot(self.txtAlias.text().strip(),self.txtVariableRobot.text(),self.txtValueRobot.text())
+				    	message_instance = None
+				    	variable_item = self._recursive_create_widget_items(self.treeWidgetRobot, self.txtVariableRobot.text(), self.txtValueRobot.text(), message_instance)
+				    	self.btnSaveRobot.setEnabled(False)
+				    	self.btnRemoveRobot.setEnabled(True)
+				    	self.txtVariableRobot.setText("")
+				    	self.txtValueRobot.setText("")
+				    	self.txtVariableRobot.setEnabled(False)
+				    	self.txtValueRobot.setEnabled(False)
+				    	self.btnRemoveRobot.setEnabled(False)
+				    	self.btnAddRobot.setEnabled(True)
+				    	self.btnAddRobot.setFocus()
 			    else:
 			         QMessageBox.information(self, 'Variable exists',self.txtVariableRobot.text()+" exists in list")
 		else:

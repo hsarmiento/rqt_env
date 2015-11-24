@@ -12,6 +12,7 @@ import xml.etree.ElementTree as ET
 import sys
 from .xml_info import XmlInfo 
 from xml.dom import minidom
+from PyQt4.QtCore import SIGNAL, QObject
 
 class DialogRobot(QDialog):
 	_column_names_robot = ['variable', 'value']
@@ -49,6 +50,35 @@ class DialogRobot(QDialog):
 		for column_name in self._column_names_robot:
 			self._column_index[column_name] = len(self._column_index)
 		self.refresh_variables()
+
+		self.connect(self, SIGNAL('triggered()'), self.closeEvent)
+
+	def closeEvent(self, event):
+		uri,hostname = self.validate_uri_hostname()
+		if uri and hostname:
+			self.destroy()
+		elif not uri and not hostname:
+			event.ignore()
+			QMessageBox.information(self, 'ROS_HOSTNAME and ROS_MASTER_URI not exists',"You must add ROS_HOSTNAME AND ROS_MASTER_URI to initial variables")
+		elif not uri:
+			event.ignore()
+			QMessageBox.information(self, 'ROS_MASTER_URI not exists',"You must add ROS_MASTER_URI to initial variables")
+		elif not hostname:
+			event.ignore()
+			QMessageBox.information(self, 'ROS_HOSTNAME not exists',"You must add ROS_HOSTNAME to initial variables")
+
+  	def validate_uri_hostname(self):
+	    root = self.treeWidgetRobot.invisibleRootItem()
+	    count = root.childCount()
+	    uri = False
+	    hostname = False
+	    for i in range(count):
+	        row = root.child(i)
+	        if row.text(0)=='ROS_MASTER_URI':
+	            uri = True
+	        if row.text(0)=='ROS_HOSTNAME':
+	        	hostname = True
+	    return (uri,hostname)
 
   # def show_click_row(self):
   #       self.btnRemoveRobot.setEnabled(True)
@@ -100,6 +130,9 @@ class DialogRobot(QDialog):
 		self.btnRemoveRobot.setEnabled(False)
 		self.txtVariableRobot.setEnabled(False)
 		self.txtValueRobot.setEnabled(False)
+
+	def validate_close(self):
+		print "cerrando"
 
 
 	def validate_item(self, item=None):
@@ -188,5 +221,7 @@ class DialogXml(object):
 		f = open(cpath,'w')
 		f.write(pretty_xml_as_string)
 		f.close()
+
+	
 
 

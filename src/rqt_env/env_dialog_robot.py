@@ -56,17 +56,17 @@ class DialogRobot(QDialog):
 
 	def closeEvent(self, event):
 		uri,hostname = self.validate_uri_hostname()
-		if uri and hostname:
-			self.destroy()
-		elif not uri and not hostname:
-			event.ignore()
-			QMessageBox.information(self, 'ROS_HOSTNAME and ROS_MASTER_URI not exists',"You must add ROS_HOSTNAME AND ROS_MASTER_URI to initial variables")
-		elif not uri:
-			event.ignore()
-			QMessageBox.information(self, 'ROS_MASTER_URI not exists',"You must add ROS_MASTER_URI to initial variables")
-		elif not hostname:
-			event.ignore()
-			QMessageBox.information(self, 'ROS_HOSTNAME not exists',"You must add ROS_HOSTNAME to initial variables")
+		# if uri and hostname:
+		# 	self.destroy()
+		# elif not uri and not hostname:
+		# 	event.ignore()
+		# 	QMessageBox.information(self, 'ROS_HOSTNAME and ROS_MASTER_URI not exists',"You must add ROS_HOSTNAME AND ROS_MASTER_URI to initial variables")
+		# elif not uri:
+		# 	event.ignore()
+		# 	QMessageBox.information(self, 'ROS_MASTER_URI not exists',"You must add ROS_MASTER_URI to initial variables")
+		# elif not hostname:
+		# 	event.ignore()
+		# 	QMessageBox.information(self, 'ROS_HOSTNAME not exists',"You must add ROS_HOSTNAME to initial variables")
 
   	def validate_uri_hostname(self):
 	    root = self.treeWidgetRobot.invisibleRootItem()
@@ -94,6 +94,14 @@ class DialogRobot(QDialog):
 	            return False
 	    return True
 
+	def validate_hostname_value(self,s):
+		if not self.validate_ip(s):
+			if s.split(':')[0].lower() == 'localhost':
+				return True
+		else:
+			return True
+		return False
+
   # def show_click_row(self):
   #       self.btnRemoveRobot.setEnabled(True)
   #       self.txtVariableRobot.setEnabled(True)
@@ -120,7 +128,15 @@ class DialogRobot(QDialog):
 		    			parse = urlparse(self.txtValueRobot.text())
 			    		if not self.validate_ip(parse.netloc.split(':')[0]):
 		    				save = False
-		    				QMessageBox.information(self, 'ROS_MASTER_URI format',"ROS_MASTER_URI must has http://")
+		    				QMessageBox.information(self, 'ROS_MASTER_URI format',"ROS_MASTER_URI must have http://")
+		    		if self.txtVariableRobot.text()=='ROS_HOSTNAME':
+		    			if not self.validate_hostname_value(self.txtValueRobot.text().split(":")[0]):
+		    				save = False
+		    				QMessageBox.information(self, 'ROS_HOSTNAME format',"ROS_HOSTNAME must have localhost or IP")
+		    			else:
+		    				if self.txtValueRobot.text().split(":")[0].lower()=="localhost":
+		    					self.txtValueRobot.setText(self.txtValueRobot.text().lower())
+
 			    	if save:
 				    	dialog_xml = DialogXml()
 				    	dialog_xml.add_variable_robot(self.txtAlias.text().strip(),self.txtVariableRobot.text(),self.txtValueRobot.text())
@@ -151,10 +167,8 @@ class DialogRobot(QDialog):
 		self.btnRemoveRobot.setEnabled(False)
 		self.txtVariableRobot.setEnabled(False)
 		self.txtValueRobot.setEnabled(False)
-
-	def validate_close(self):
-		print "cerrando"
-
+		self.btnAddRobot.setEnabled(True)
+ 
 
 	def validate_item(self, item=None):
 		root = self.treeWidgetRobot.invisibleRootItem()

@@ -30,14 +30,17 @@ class XmlInfo(object):
 						l.append([elem.attrib['id'],node.attrib['value'],elem.attrib['status']])
 		return l
 		
-	def removeGeneralVariable(self):
-		 for elem in self._root.iter(tag='general'):
-		 	rank = int(elem.find('variable').text)
-		 	if rank > 50:
-		 		root.remove(country)
-		 		tree.write('output.xml')
-
-	def add_variable_ros(self,variable,value):
+	def removeGeneralVariable(self,variable):
+		self.openXml()
+  		for elem in self._root.iter(tag='general'):
+   			for node in elem.iterfind('variable'):
+   				for child in node.getiterator():
+   					if child.attrib['name']==variable:
+   						elem.remove(node) 
+		cpath = os.path.dirname(os.path.abspath(sys.argv[0]))+'/../resource/env.xml'
+		ET.ElementTree(self._root).write(cpath)
+ 
+ 	def add_variable_ros(self,variable,value):
 		self.openXml()
 		for child in self._root:
 			if child.tag == "general":
@@ -50,4 +53,12 @@ class XmlInfo(object):
 		f = open(cpath,'w')
 		f.write(pretty_xml_as_string)
 		f.close()
-  
+
+	def modify_variable_ros(self,variable,value):
+		self.openXml()
+  		for elem in self._root.iter(tag='general'):
+  			for node in elem.iterfind('variable'):
+				if node.attrib['name'] == variable:
+					node.set('value',value)
+		cpath = os.path.dirname(os.path.abspath(sys.argv[0]))+'/../resource/env.xml'
+		ET.ElementTree(self._root).write(cpath)

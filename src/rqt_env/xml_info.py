@@ -30,7 +30,7 @@ class XmlInfo(object):
 						l.append([elem.attrib['id'],node.attrib['value'],elem.attrib['status']])
 		return l
 		
-	def removeGeneralVariable(self,variable):
+	def remove_general_variable(self,variable):
 		self.openXml()
   		for elem in self._root.iter(tag='general'):
    			for node in elem.iterfind('variable'):

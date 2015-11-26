@@ -63,8 +63,7 @@ class EnvWidget(QWidget):
         header_robot.setResizeMode(QHeaderView.ResizeToContents) 
         header_robot.setContextMenuPolicy(Qt.CustomContextMenu)
 
-        #clicked buttons General (all window)    
-        
+        #clicked buttons General (all window)         
         self.btnApply.clicked.connect(self.click_btnApply) 
 
         #clicked buttons ROS
@@ -78,6 +77,9 @@ class EnvWidget(QWidget):
         self.btnDetailsRobot.clicked.connect(self.click_btnDetailsRobot)
         self.btnSaveRobot.clicked.connect(self.click_btnSaveRobot)
         self.btnRemoveRobot.clicked.connect(self.click_btnRemoveRobot)
+
+        #clicked tabs
+        self.tabWidget.currentChanged.connect(self.click_tab_ros)
 
         #init state general button
         self.btnSaveRos.setEnabled(False)
@@ -97,6 +99,15 @@ class EnvWidget(QWidget):
             self._column_index[column_name] = len(self._column_index)
 
         self.refresh_env()
+
+    def click_tab_ros(self,i):
+        if i == 0:
+            self.env_ros_tree_widget.clear()
+            self.refresh_env()
+        else:
+            self.env_robot_tree_widget.clear()
+            self.refresh_env()
+
 
     def show_click_row(self):
         self.btnRemoveRos.setEnabled(True)
@@ -182,7 +193,7 @@ class EnvWidget(QWidget):
         item = self.env_ros_tree_widget.currentItem()
         if reply == QMessageBox.Yes:
             xml_info = XmlInfo()
-            xml_info.removeGeneralVariable(item.text(0))
+            xml_info.remove_general_variable(item.text(0))
             self.remove_Selected_Item_WidgetTree_ros()
         else:
             pass

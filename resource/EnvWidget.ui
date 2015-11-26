@@ -25,7 +25,7 @@
    <property name="currentIndex">
     <number>0</number>
    </property>
-   <widget class="QWidget" name="tab">
+   <widget class="QWidget" name="tabRos">
     <attribute name="title">
      <string>ROS</string>
     </attribute>

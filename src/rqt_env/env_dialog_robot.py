@@ -25,7 +25,7 @@ class DialogRobot(QDialog):
 		loadUi(ui_file, self)
 		self.treeWidgetRobot.sortByColumn(0, Qt.AscendingOrder)
 		self.treeWidgetRobot.setEditTriggers(self.treeWidgetRobot.NoEditTriggers)
-		# self.treeWidgetRobot.clicked.connect(self.show_click_row)
+		self.treeWidgetRobot.clicked.connect(self.click_row)
  
  
 		# self.treeWidget.clicked.connect(self.show_click_row)
@@ -53,6 +53,16 @@ class DialogRobot(QDialog):
 		self.refresh_variables()
 
 		self.connect(self, SIGNAL('triggered()'), self.closeEvent)
+
+	
+	def click_row(self):
+		self.btnRemoveRobot.setEnabled(True)
+		self.txtVariableRobot.setEnabled(False)
+		self.txtValueRobot.setEnabled(True)
+		item = self.treeWidgetRobot.currentItem()
+		self.txtVariableRobot.setText(item.text(0))
+		self.txtValueRobot.setText(item.text(1))
+		self.btnSaveRobot.setEnabled(True)
 
 	def closeEvent(self, event):
 		uri,hostname = self.validate_uri_hostname()
@@ -158,7 +168,15 @@ class DialogRobot(QDialog):
 			self.txtAlias.setFocus()
 
 	def click_btnRemoveRobot(self):
-		pass
+		quit_msg = "Are you sure you want to remove this element?"
+		reply = QMessageBox.question(self, 'Message', quit_msg, QMessageBox.Yes, QMessageBox.No)
+		item = self.treeWidgetRobot.currentItem()
+		if reply == QMessageBox.Yes:
+		    # xml_info = XmlInfo()
+		    # xml_info.remove_general_variable(item.text(0))
+		    self.remove_selected_item_widgetTree()
+		else:
+		    pass
 
 	def click_btnCancelRobot(self):
 		self.txtVariableRobot.setText("")
@@ -205,11 +223,15 @@ class DialogRobot(QDialog):
 
 	def _recursive_create_widget_items(self, parent, variable_name, variable_value, message):
 	    # topic_text = variable_name
-	    print variable_name,variable_value
 	    item = TreeWidgetItem(variable_name, parent)
 	    item.setText(self._column_index['variable'], variable_name)
 	    item.setText(self._column_index['value'], variable_value) 
 	    return item
+
+	def remove_selected_item_widgetTree(self):
+	    root = self.treeWidgetRobot.invisibleRootItem()
+	    for item in self.treeWidgetRobot.selectedItems():
+	        (item.parent() or root).removeChild(item)
  
 
 class TreeWidgetItem(QTreeWidgetItem):

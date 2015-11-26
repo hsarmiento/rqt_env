@@ -76,8 +76,7 @@ class XmlInfo(object):
 
 	def modify_variable_robot(self,variable,value,alias):
 		self.openXml()
-		print variable,value,alias
-  		for elem in self._root.iter(tag='robot'):
+		for elem in self._root.iter(tag='robot'):
   			if elem.attrib["id"]==alias:
   				for node in elem.iterfind('variable'):
   					if node.attrib['name'] == variable:

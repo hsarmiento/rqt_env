@@ -63,6 +63,8 @@ class DialogRobot(QDialog):
 		self.txtVariableRobot.setText(item.text(0))
 		self.txtValueRobot.setText(item.text(1))
 		self.btnSaveRobot.setEnabled(True)
+		if item.text(0)=="ROS_MASTER_URI" or item.text(0)=="ROS_HOSTNAME":
+			self.btnRemoveRobot.setEnabled(False)
 
 	def closeEvent(self, event):
 		uri,hostname = self.validate_uri_hostname()
@@ -132,57 +134,61 @@ class DialogRobot(QDialog):
 
 
 	def click_btnSaveRobot(self):
+		if self.txtVariableRobot.text() == 'ROS_MASTER_URI':
+			parse = urlparse(self.txtValueRobot.text())
+			if not self.validate_ip(parse.netloc.split(':')[0]):
+				QMessageBox.information(self, 'ROS_MASTER_URI format',"ROS_MASTER_URI must have http://")
+				return False
+		if self.txtVariableRobot.text()=='ROS_HOSTNAME':
+			if not self.validate_hostname_value(self.txtValueRobot.text().split(":")[0]):
+				QMessageBox.information(self, 'ROS_HOSTNAME format',"ROS_HOSTNAME must have localhost or IP")
+				return False
+			else:
+				if self.txtValueRobot.text().split(":")[0].lower()=="localhost":
+					self.txtValueRobot.setText(self.txtValueRobot.text().lower())
 		if self.txtVariableRobot.isEnabled():
-  			save = True
 			if self.txtAlias.text().strip() != "":
 				if self.txtVariableRobot.text().strip() != "" and self.txtValueRobot.text().strip() != "" :
-				    if not self.validate_item(self.txtVariableRobot.text()):
-				    	if self.txtVariableRobot.text() == 'ROS_MASTER_URI':
-			    			parse = urlparse(self.txtValueRobot.text())
-				    		if not self.validate_ip(parse.netloc.split(':')[0]):
-			    				save = False
-			    				QMessageBox.information(self, 'ROS_MASTER_URI format',"ROS_MASTER_URI must have http://")
-			    		if self.txtVariableRobot.text()=='ROS_HOSTNAME':
-			    			if not self.validate_hostname_value(self.txtValueRobot.text().split(":")[0]):
-			    				save = False
-			    				QMessageBox.information(self, 'ROS_HOSTNAME format',"ROS_HOSTNAME must have localhost or IP")
-			    			else:
-			    				if self.txtValueRobot.text().split(":")[0].lower()=="localhost":
-			    					self.txtValueRobot.setText(self.txtValueRobot.text().lower())
-
-				    	if save:
-					    	dialog_xml = DialogXml()
-					    	
-					     	dialog_xml.add_variable_robot(self.txtAlias.text().strip(),self.txtVariableRobot.text(),self.txtValueRobot.text())
-					    	message_instance = None
-					    	variable_item = self._recursive_create_widget_items(self.treeWidgetRobot, self.txtVariableRobot.text(), self.txtValueRobot.text(), message_instance)
-					    	self.btnSaveRobot.setEnabled(False)
-					    	self.btnRemoveRobot.setEnabled(True)
-					    	self.txtVariableRobot.setText("")
-					    	self.txtValueRobot.setText("")
-					    	self.txtVariableRobot.setEnabled(False)
-					    	self.txtValueRobot.setEnabled(False)
-					    	self.btnRemoveRobot.setEnabled(False)
-					    	self.btnAddRobot.setEnabled(True)
-					    	self.btnAddRobot.setFocus()
+				    if not self.exist_item(self.txtVariableRobot.text()):
+				    	dialog_xml = DialogXml()					    	
+				     	dialog_xml.add_variable_robot(self.txtAlias.text().strip(),self.txtVariableRobot.text(),self.txtValueRobot.text())
+				    	message_instance = None
+				    	variable_item = self._recursive_create_widget_items(self.treeWidgetRobot, self.txtVariableRobot.text(), self.txtValueRobot.text(), message_instance)
 				    else:
 				         QMessageBox.information(self, 'Variable exists',self.txtVariableRobot.text()+" exists in list")
 			else:
 				QMessageBox.information(self, 'Alias is empty',"Please, insert a value for alias")
 				self.txtAlias.setFocus()
-		else:
-			print "modify"
-			xml_info = XmlInfo()
-			xml_info.modify_variable_robot(self.txtVariableRobot.text(),self.txtValueRobot.text(),self.txtAlias.text().strip())
+		else: 
+			xml_dialog = DialogXml()
+			xml_dialog.modify_variable_robot(self.txtVariableRobot.text(),self.txtValueRobot.text(),self.txtAlias.text().strip())
+			self.treeWidgetRobot.clear()
+  			self.refresh_variables()
+
+		self.btnSaveRobot.setEnabled(False)
+		self.btnRemoveRobot.setEnabled(True)
+		self.txtVariableRobot.setText("")
+		self.txtValueRobot.setText("")
+		self.txtVariableRobot.setEnabled(False)
+		self.txtValueRobot.setEnabled(False)
+		self.btnRemoveRobot.setEnabled(False)
+		self.btnAddRobot.setEnabled(True)
+		self.btnAddRobot.setFocus()
 
 	def click_btnRemoveRobot(self):
 		quit_msg = "Are you sure you want to remove this element?"
 		reply = QMessageBox.question(self, 'Message', quit_msg, QMessageBox.Yes, QMessageBox.No)
 		item = self.treeWidgetRobot.currentItem()
 		if reply == QMessageBox.Yes:
-		    # xml_info = XmlInfo()
-		    # xml_info.remove_general_variable(item.text(0))
-		    self.remove_selected_item_widgetTree()
+			xml_dialog = DialogXml()
+			xml_dialog.remove_robot_variable(item.text(0),self.txtAlias.text().strip())
+			self.remove_selected_item_widgetTree()
+			self.txtVariableRobot.setText("")
+			self.txtValueRobot.setText("")
+			self.txtVariableRobot.setEnabled(True)
+			self.btnRemoveRobot.setEnabled(False)
+			self.btnAddRobot.setEnabled(True)
+			self.btnAddRobot.setFocus()
 		else:
 		    pass
 
@@ -196,7 +202,7 @@ class DialogRobot(QDialog):
 		self.btnAddRobot.setEnabled(True)
  
 
-	def validate_item(self, item=None):
+	def exist_item(self, item=None):
 		root = self.treeWidgetRobot.invisibleRootItem()
 		count = root.childCount()
 		for i in range(count):
@@ -240,8 +246,7 @@ class DialogRobot(QDialog):
 	    root = self.treeWidgetRobot.invisibleRootItem()
 	    for item in self.treeWidgetRobot.selectedItems():
 	        (item.parent() or root).removeChild(item)
-	        xml_info = XmlInfo()
-            xml_info.remove_robot_variable(item.text(0),self.txtAlias.text().strip())
+	       
       
  
 
@@ -289,6 +294,36 @@ class DialogXml(object):
 		f = open(cpath,'w')
 		f.write(pretty_xml_as_string)
 		f.close()
+
+	def modify_variable_robot(self,variable,value,alias):
+		self.openXml()
+		for elem in self._root.iter(tag='robot'):
+  			if elem.attrib["id"]==alias:
+  				for node in elem.iterfind('variable'):
+  					if node.attrib['name'] == variable:
+						node.set('value',value)
+		cpath = os.path.dirname(os.path.abspath(sys.argv[0]))+'/../resource/env.xml'
+		ET.ElementTree(self._root).write(cpath)
+
+	def remove_robot_variable(self,variable,alias):
+		self.openXml()
+  		for elem in self._root.iter(tag='robot'):
+  			if elem.attrib["id"]==alias:
+	   			for node in elem.iterfind('variable'):   				
+   					for child in node.getiterator():
+   						if child.attrib['name']==variable:
+   							elem.remove(node) 
+		cpath = os.path.dirname(os.path.abspath(sys.argv[0]))+'/../resource/env.xml'
+		ET.ElementTree(self._root).write(cpath)
+
+	def remove_robot_list_variable(self,variable):
+		self.openXml()
+  		for elem in self._root.iter(tag='robots'):
+   			for node in elem.iterfind('robot'):
+   				if node.attrib['id']==variable:
+   					elem.remove(node) 
+		cpath = os.path.dirname(os.path.abspath(sys.argv[0]))+'/../resource/env.xml'
+		ET.ElementTree(self._root).write(cpath) 
 
 	
 

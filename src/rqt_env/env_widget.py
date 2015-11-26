@@ -141,14 +141,11 @@ class EnvWidget(QWidget):
         self.clear_checked()
         quit_msg = "Are you sure you want to Apply this configuration?"
         reply = QMessageBox.question(self, 'Message', quit_msg, QMessageBox.Yes, QMessageBox.No)
-
         if reply == QMessageBox.Yes:
-            print "OK"
             pass
         else:
             pass
     
-   
     def click_btn_new_ros(self): 
         self.btnNewRos.setEnabled(False)
         self.txtVariableRos.setEnabled(True)
@@ -159,8 +156,6 @@ class EnvWidget(QWidget):
         self.txtVariableRos.setFocus()
         self.txtVariableRos.setText("")
         self.txtValueRos.setText("")
-
- 
   
     def click_btnSaveRos(self):
         if self.txtVariableRos.isEnabled():
@@ -185,6 +180,7 @@ class EnvWidget(QWidget):
         self.txtVariableRos.setEnabled(False)
         self.txtValueRos.setEnabled(False)
         self.btnRemoveRos.setEnabled(False)
+        self.btnNewRos.setEnabled(True)
 
 
     def click_btnRemoveRos(self):
@@ -195,6 +191,13 @@ class EnvWidget(QWidget):
             xml_info = XmlInfo()
             xml_info.remove_general_variable(item.text(0))
             self.remove_Selected_Item_WidgetTree_ros()
+            self.txtVariableRos.setText("")
+            self.txtValueRos.setText("")
+            self.txtVariableRos.setEnabled(True)
+            self.btnRemoveRos.setEnabled(False)
+            self.btnNewRos.setFocus()
+            self.btnSaveRos.setEnabled(False)
+
         else:
             pass
 

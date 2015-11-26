@@ -63,6 +63,7 @@ class DialogRobot(QDialog):
 		self.txtVariableRobot.setText(item.text(0))
 		self.txtValueRobot.setText(item.text(1))
 		self.btnSaveRobot.setEnabled(True)
+		self.btnAddRobot.setEnabled(True)
 		if item.text(0)=="ROS_MASTER_URI" or item.text(0)=="ROS_HOSTNAME":
 			self.btnRemoveRobot.setEnabled(False)
 
@@ -130,6 +131,8 @@ class DialogRobot(QDialog):
 		self.btnRemoveRobot.setEnabled(False)
 		self.treeWidgetRobot.clearSelection()
 		self.txtVariableRobot.setFocus()
+		self.txtVariableRobot.setText("")
+		self.txtValueRobot.setText("")
 
 
 

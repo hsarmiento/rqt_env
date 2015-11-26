@@ -208,7 +208,6 @@ class EnvWidget(QWidget):
 
                 
     def click_btnAddRobot(self):
-        print "Test click_btnAddRobot"
         q = DialogRobot()
         q.exec_()
         self.env_robot_tree_widget.clear()
@@ -216,7 +215,6 @@ class EnvWidget(QWidget):
 
     def click_btnDetailsRobot(self):
         item = self.env_robot_tree_widget.currentItem()
-        #print "item",item
         if not item==None:
             q = DialogRobot(item.text(0))
             q.exec_()
@@ -224,15 +222,16 @@ class EnvWidget(QWidget):
             self.refresh_env()
 
     def click_btnSaveRobot(self):
-        print "Test click_btnSaveRobot"
-
+        pass
 
     def click_btnRemoveRobot(self):
-        print "Test click_btnRemoveRobot"
+      
         quit_msg = "Are you sure you want to remove this element?"
         reply = QMessageBox.question(self, 'Message', quit_msg, QMessageBox.Yes, QMessageBox.No)
-
+        item = self.env_robot_tree_widget.currentItem()
         if reply == QMessageBox.Yes:
+            xml_info = XmlInfo()
+            xml_info.remove_robot_list_variable(item.text(0))
             self.removeSelectedItemWidgetTree()
         else:
             pass
@@ -248,8 +247,9 @@ class EnvWidget(QWidget):
             (item.parent() or root).removeChild(item)
  
     def get_selected_item(self,tree_widget):
+        pass
         # root = tree_widget.invisibleRootItem()
-        print tree_widget.selectedItems()
+        # print tree_widget.selectedItems()
 
     def set_topic_specifier(self, specifier):
         self._select_topic_type = specifier
@@ -318,7 +318,6 @@ class EnvWidget(QWidget):
         return item
 
     def _toggle_monitoring(self, topic_name):
-        print "ckeck"
         item = self._tree_items[topic_name]
         if item.checkState(0):
             self._topics[topic_name]['info'].start_monitoring()
@@ -328,7 +327,6 @@ class EnvWidget(QWidget):
     def _recursive_delete_widget_items(self, item):
         def _recursive_remove_items_from_tree(item):
             for index in reversed(range(item.childCount())):
-                print "item ",item.childCount()
                 _recursive_remove_items_from_tree(item.child(index))
             topic_name = item.data(0, Qt.UserRole)
             del self._tree_items[topic_name]
@@ -375,8 +373,6 @@ class TreeWidgetItem(QTreeWidgetItem):
         if role == Qt.CheckStateRole:
             state = self.checkState(column)
         super(TreeWidgetItem, self).setData(column, role, value)
-       # print "role", Qt.CheckStateRole
-        #print "self._topic_name", self._topic_name
         #if role == Qt.CheckStateRole and state != self.checkState(column):
          #   self._check_state_changed_callback(self._topic_name)
 

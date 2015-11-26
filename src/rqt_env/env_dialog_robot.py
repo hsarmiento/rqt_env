@@ -129,43 +129,51 @@ class DialogRobot(QDialog):
 		self.treeWidgetRobot.clearSelection()
 		self.txtVariableRobot.setFocus()
 
-	def click_btnSaveRobot(self):
-		save = True
-		if self.txtAlias.text().strip() != "":
-			if self.txtVariableRobot.text().strip() != "" and self.txtValueRobot.text().strip() != "" :
-			    if not self.validate_item(self.txtVariableRobot.text()):
-			    	if self.txtVariableRobot.text() == 'ROS_MASTER_URI':
-		    			parse = urlparse(self.txtValueRobot.text())
-			    		if not self.validate_ip(parse.netloc.split(':')[0]):
-		    				save = False
-		    				QMessageBox.information(self, 'ROS_MASTER_URI format',"ROS_MASTER_URI must have http://")
-		    		if self.txtVariableRobot.text()=='ROS_HOSTNAME':
-		    			if not self.validate_hostname_value(self.txtValueRobot.text().split(":")[0]):
-		    				save = False
-		    				QMessageBox.information(self, 'ROS_HOSTNAME format',"ROS_HOSTNAME must have localhost or IP")
-		    			else:
-		    				if self.txtValueRobot.text().split(":")[0].lower()=="localhost":
-		    					self.txtValueRobot.setText(self.txtValueRobot.text().lower())
 
-			    	if save:
-				    	dialog_xml = DialogXml()
-				    	dialog_xml.add_variable_robot(self.txtAlias.text().strip(),self.txtVariableRobot.text(),self.txtValueRobot.text())
-				    	message_instance = None
-				    	variable_item = self._recursive_create_widget_items(self.treeWidgetRobot, self.txtVariableRobot.text(), self.txtValueRobot.text(), message_instance)
-				    	self.btnSaveRobot.setEnabled(False)
-				    	self.btnRemoveRobot.setEnabled(True)
-				    	self.txtVariableRobot.setText("")
-				    	self.txtValueRobot.setText("")
-				    	self.txtVariableRobot.setEnabled(False)
-				    	self.txtValueRobot.setEnabled(False)
-				    	self.btnRemoveRobot.setEnabled(False)
-				    	self.btnAddRobot.setEnabled(True)
-				    	self.btnAddRobot.setFocus()
-			    else:
-			         QMessageBox.information(self, 'Variable exists',self.txtVariableRobot.text()+" exists in list")
+
+	def click_btnSaveRobot(self):
+		if self.txtVariableRobot.isEnabled():
+  			save = True
+			if self.txtAlias.text().strip() != "":
+				if self.txtVariableRobot.text().strip() != "" and self.txtValueRobot.text().strip() != "" :
+				    if not self.validate_item(self.txtVariableRobot.text()):
+				    	if self.txtVariableRobot.text() == 'ROS_MASTER_URI':
+			    			parse = urlparse(self.txtValueRobot.text())
+				    		if not self.validate_ip(parse.netloc.split(':')[0]):
+			    				save = False
+			    				QMessageBox.information(self, 'ROS_MASTER_URI format',"ROS_MASTER_URI must have http://")
+			    		if self.txtVariableRobot.text()=='ROS_HOSTNAME':
+			    			if not self.validate_hostname_value(self.txtValueRobot.text().split(":")[0]):
+			    				save = False
+			    				QMessageBox.information(self, 'ROS_HOSTNAME format',"ROS_HOSTNAME must have localhost or IP")
+			    			else:
+			    				if self.txtValueRobot.text().split(":")[0].lower()=="localhost":
+			    					self.txtValueRobot.setText(self.txtValueRobot.text().lower())
+
+				    	if save:
+					    	dialog_xml = DialogXml()
+					    	
+					     	dialog_xml.add_variable_robot(self.txtAlias.text().strip(),self.txtVariableRobot.text(),self.txtValueRobot.text())
+					    	message_instance = None
+					    	variable_item = self._recursive_create_widget_items(self.treeWidgetRobot, self.txtVariableRobot.text(), self.txtValueRobot.text(), message_instance)
+					    	self.btnSaveRobot.setEnabled(False)
+					    	self.btnRemoveRobot.setEnabled(True)
+					    	self.txtVariableRobot.setText("")
+					    	self.txtValueRobot.setText("")
+					    	self.txtVariableRobot.setEnabled(False)
+					    	self.txtValueRobot.setEnabled(False)
+					    	self.btnRemoveRobot.setEnabled(False)
+					    	self.btnAddRobot.setEnabled(True)
+					    	self.btnAddRobot.setFocus()
+				    else:
+				         QMessageBox.information(self, 'Variable exists',self.txtVariableRobot.text()+" exists in list")
+			else:
+				QMessageBox.information(self, 'Alias is empty',"Please, insert a value for alias")
+				self.txtAlias.setFocus()
 		else:
-			QMessageBox.information(self, 'Alias is empty',"Please, insert a value for alias")
-			self.txtAlias.setFocus()
+			print "modify"
+			xml_info = XmlInfo()
+			xml_info.modify_variable_robot(self.txtVariableRobot.text(),self.txtValueRobot.text(),self.txtAlias.text().strip())
 
 	def click_btnRemoveRobot(self):
 		quit_msg = "Are you sure you want to remove this element?"
@@ -232,6 +240,9 @@ class DialogRobot(QDialog):
 	    root = self.treeWidgetRobot.invisibleRootItem()
 	    for item in self.treeWidgetRobot.selectedItems():
 	        (item.parent() or root).removeChild(item)
+	        xml_info = XmlInfo()
+            xml_info.remove_robot_variable(item.text(0),self.txtAlias.text().strip())
+      
  
 
 class TreeWidgetItem(QTreeWidgetItem):

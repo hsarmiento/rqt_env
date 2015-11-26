@@ -39,6 +39,26 @@ class XmlInfo(object):
    						elem.remove(node) 
 		cpath = os.path.dirname(os.path.abspath(sys.argv[0]))+'/../resource/env.xml'
 		ET.ElementTree(self._root).write(cpath)
+	
+	def remove_robot_variable(self,variable,alias):
+		self.openXml()
+  		for elem in self._root.iter(tag='robot'):
+  			if elem.attrib["id"]==alias:
+	   			for node in elem.iterfind('variable'):   				
+   					for child in node.getiterator():
+   						if child.attrib['name']==variable:
+   							elem.remove(node) 
+		cpath = os.path.dirname(os.path.abspath(sys.argv[0]))+'/../resource/env.xml'
+		ET.ElementTree(self._root).write(cpath)
+
+	def remove_robot_list_variable(self,variable):
+		self.openXml()
+  		for elem in self._root.iter(tag='robots'):
+   			for node in elem.iterfind('robot'):
+   				if node.attrib['id']==variable:
+   					elem.remove(node) 
+		cpath = os.path.dirname(os.path.abspath(sys.argv[0]))+'/../resource/env.xml'
+		ET.ElementTree(self._root).write(cpath) 
  
  	def add_variable_ros(self,variable,value):
 		self.openXml()
@@ -53,6 +73,17 @@ class XmlInfo(object):
 		f = open(cpath,'w')
 		f.write(pretty_xml_as_string)
 		f.close()
+
+	def modify_variable_robot(self,variable,value,alias):
+		self.openXml()
+		print variable,value,alias
+  		for elem in self._root.iter(tag='robot'):
+  			if elem.attrib["id"]==alias:
+  				for node in elem.iterfind('variable'):
+  					if node.attrib['name'] == variable:
+						node.set('value',value)
+		cpath = os.path.dirname(os.path.abspath(sys.argv[0]))+'/../resource/env.xml'
+		ET.ElementTree(self._root).write(cpath)
 
 	def modify_variable_ros(self,variable,value):
 		self.openXml()

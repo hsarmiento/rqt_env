@@ -29,7 +29,18 @@ class XmlInfo(object):
 					if node.attrib['name'] == 'ROS_MASTER_URI':
 						l.append([elem.attrib['id'],node.attrib['value'],elem.attrib['status']])
 		return l
-		
+	
+
+	def modify_deleted_status_general_variable(self,variable):
+		self.openXml()
+  		for elem in self._root.iter(tag='general'):
+   			for node in elem.iterfind('variable'):
+   				for child in node.getiterator():
+   					if child.attrib['name']==variable:
+   						child.set('deleted','1')
+		cpath = os.path.dirname(os.path.abspath(sys.argv[0]))+'/../resource/env.xml'
+		ET.ElementTree(self._root).write(cpath)
+
 	def remove_general_variable(self,variable):
 		self.openXml()
   		for elem in self._root.iter(tag='general'):
@@ -40,17 +51,6 @@ class XmlInfo(object):
 		cpath = os.path.dirname(os.path.abspath(sys.argv[0]))+'/../resource/env.xml'
 		ET.ElementTree(self._root).write(cpath)
 	
-	def remove_robot_variable(self,variable,alias):
-		self.openXml()
-  		for elem in self._root.iter(tag='robot'):
-  			if elem.attrib["id"]==alias:
-	   			for node in elem.iterfind('variable'):   				
-   					for child in node.getiterator():
-   						if child.attrib['name']==variable:
-   							elem.remove(node) 
-		cpath = os.path.dirname(os.path.abspath(sys.argv[0]))+'/../resource/env.xml'
-		ET.ElementTree(self._root).write(cpath)
-
 	def remove_robot_list_variable(self,variable):
 		self.openXml()
   		for elem in self._root.iter(tag='robots'):
@@ -58,9 +58,9 @@ class XmlInfo(object):
    				if node.attrib['id']==variable:
    					elem.remove(node) 
 		cpath = os.path.dirname(os.path.abspath(sys.argv[0]))+'/../resource/env.xml'
-		ET.ElementTree(self._root).write(cpath) 
+		ET.ElementTree(self._root).write(cpath)
  
- 	def add_variable_ros(self,variable,value):
+ 	def add_variable_general(self,variable,value):
 		self.openXml()
 		for child in self._root:
 			if child.tag == "general":
@@ -74,17 +74,7 @@ class XmlInfo(object):
 		f.write(pretty_xml_as_string)
 		f.close()
 
-	def modify_variable_robot(self,variable,value,alias):
-		self.openXml()
-		for elem in self._root.iter(tag='robot'):
-  			if elem.attrib["id"]==alias:
-  				for node in elem.iterfind('variable'):
-  					if node.attrib['name'] == variable:
-						node.set('value',value)
-		cpath = os.path.dirname(os.path.abspath(sys.argv[0]))+'/../resource/env.xml'
-		ET.ElementTree(self._root).write(cpath)
-
-	def modify_variable_ros(self,variable,value):
+	def modify_variable_general(self,variable,value):
 		self.openXml()
   		for elem in self._root.iter(tag='general'):
   			for node in elem.iterfind('variable'):
@@ -92,3 +82,13 @@ class XmlInfo(object):
 					node.set('value',value)
 		cpath = os.path.dirname(os.path.abspath(sys.argv[0]))+'/../resource/env.xml'
 		ET.ElementTree(self._root).write(cpath)
+
+	def get_deleted_general_variable(self):
+		l = []
+		self.openXml()
+  		for elem in self._root.iter(tag='general'):
+  			for node in elem.iterfind('variable'):
+  				if node.attrib['deleted'] == '1':
+  					l.append(node.attrib['name'])
+		return l 
+

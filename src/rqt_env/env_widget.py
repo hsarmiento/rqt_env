@@ -63,8 +63,8 @@ class EnvWidget(QWidget):
         header_robot.setResizeMode(QHeaderView.ResizeToContents) 
         header_robot.setContextMenuPolicy(Qt.CustomContextMenu)
 
-        #clicked buttons General (all window)         
-        self.btnApply.clicked.connect(self.click_btnApply) 
+        #clicked buttons APPLY (all windows)         
+        self.btnApply.clicked.connect(self.click_btn_apply) 
 
         #clicked buttons ROS
         self.btnNewRos.clicked.connect(self.click_btn_new_ros) 
@@ -137,14 +137,16 @@ class EnvWidget(QWidget):
         return False
         
 
-    def click_btnApply(self):
-        self.clear_checked()
+    def click_btn_apply(self):
+        # self.clear_checked()
+        xml_info = XmlInfo()
+        deleted_general_items = xml_info.get_deleted_general_variable()  #get deleted general items (deleted status = 1 in xml)
         quit_msg = "Are you sure you want to Apply this configuration?"
-        reply = QMessageBox.question(self, 'Message', quit_msg, QMessageBox.Yes, QMessageBox.No)
-        if reply == QMessageBox.Yes:
-            pass
-        else:
-            pass
+        # reply = QMessageBox.question(self, 'Message', quit_msg, QMessageBox.Yes, QMessageBox.No)
+        # if reply == QMessageBox.Yes:
+        #     pass
+        # else:
+        #     pass
     
     def click_btn_new_ros(self): 
         self.btnNewRos.setEnabled(False)
@@ -162,7 +164,7 @@ class EnvWidget(QWidget):
             if self.txtVariableRos.text().strip() != "" and self.txtValueRos.text().strip() != "" :
                 if not self.validate_item(self.txtVariableRos.text()):
                     xml_info = XmlInfo()
-                    xml_info.add_variable_ros(self.txtVariableRos.text(),self.txtValueRos.text())
+                    xml_info.add_variable_general(self.txtVariableRos.text(),self.txtValueRos.text())
                     message_instance = None
                     self._recursive_create_widget_items(self.env_ros_tree_widget, self.txtVariableRos.text(), self.txtValueRos.text(), message_instance)
                 else:
@@ -170,7 +172,7 @@ class EnvWidget(QWidget):
         else:
             message_instance = None
             xml_info = XmlInfo()
-            xml_info.modify_variable_ros(self.txtVariableRos.text(),self.txtValueRos.text())
+            xml_info.modify_variable_general(self.txtVariableRos.text(),self.txtValueRos.text())
             self.env_ros_tree_widget.clear()
             self.refresh_env()
         self.btnSaveRos.setEnabled(False)
@@ -189,7 +191,8 @@ class EnvWidget(QWidget):
         item = self.env_ros_tree_widget.currentItem()
         if reply == QMessageBox.Yes:
             xml_info = XmlInfo()
-            xml_info.remove_general_variable(item.text(0))
+            xml_info.modify_deleted_status_general_variable(item.text(0))
+            # xml_info.remove_general_variable(item.text(0))   #not yet, just apply when apply button is clicked
             self.remove_Selected_Item_WidgetTree_ros()
             self.txtVariableRos.setText("")
             self.txtValueRos.setText("")

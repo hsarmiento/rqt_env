@@ -20,6 +20,7 @@ class DialogRobot(QDialog):
 	def __init__(self,alias=None):
 		super(DialogRobot,self).__init__()
 		self._alias = alias
+		self._temp_alias = alias
 		rp = rospkg.RosPack()
 		ui_file = os.path.join(rp.get_path('rqt_env'), 'resource', 'NewRobotDialog.ui')
 		loadUi(ui_file, self)

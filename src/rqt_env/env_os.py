@@ -13,10 +13,13 @@ class EnvOs(object):
 		cpath = os.path.dirname(os.path.abspath(sys.argv[0]))+'/../resource/env.xml' 
 		self._root = ET.parse(cpath).getroot()
 
-	def parse_to_htbash(self):
-		xml_info = XmlInfo()
-		general_deleted = xml_info.get_deleted_general_variable()
-		print general_deleted
-
-
-
+	def unset_to_htbash(self,list_variables):
+		cpath = os.path.dirname(os.path.abspath(sys.argv[0]))
+		cpath = '/'.join(cpath.split('/')[:3])+'/'
+		f=open(cpath+".htbash","w")
+		for item in set(list_variables):
+			f.write("unset "+item+'\n')
+		f.close()
+		
+	def export_to_htbash(self):
+		pass

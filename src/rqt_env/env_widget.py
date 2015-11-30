@@ -143,7 +143,14 @@ class EnvWidget(QWidget):
         xml_info = XmlInfo()
         deleted_general_items = xml_info.get_deleted_general_variable()  #get deleted general items (deleted status = 1 in xml)
         env_os = EnvOs()
-        env_os.parse_to_htbash()
+      
+        dialog_xml = DialogXml()
+        dialog_xml.get_deleted_variable_robot()
+        deleted_robots_items=dialog_xml.get_deleted_variable_robot()
+        env_os.unset_to_htbash(deleted_robots_items+deleted_robots_items)
+
+
+
         quit_msg = "Are you sure you want to Apply this configuration?"
         # reply = QMessageBox.question(self, 'Message', quit_msg, QMessageBox.Yes, QMessageBox.No)
         # if reply == QMessageBox.Yes:

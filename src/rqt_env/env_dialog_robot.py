@@ -337,8 +337,28 @@ class DialogXml(object):
 		cpath = os.path.dirname(os.path.abspath(sys.argv[0]))+'/../resource/env.xml'
 		ET.ElementTree(self._root).write(cpath)
 
+	def get_deleted_variable_robot(self):
+		c=set()
+		self.openXml()
+		for elem in self._root.iter(tag='robots'):
+  			for node in elem.iterfind('robot'):
+  					if node.attrib['deleted'] == "1":
+  						for child in node.iterfind("variable"):
+  							c.add(child.attrib['name'])
+  					else: 
+  						for child in node.iterfind("variable"):
+  							if child.attrib["deleted"]=="1":
+  								c.add(child.attrib["name"])
+		return list(c)
 
-	# def get_removed_variable_robot(self) 
+	def get_deleted_general_variable(self):
+		l = []
+		self.openXml()
+  		for elem in self._root.iter(tag='general'):
+  			for node in elem.iterfind('variable'):
+  				if node.attrib['deleted'] == '1':
+  					l.append(node.attrib['name'])
+		return l 
 
 	
 

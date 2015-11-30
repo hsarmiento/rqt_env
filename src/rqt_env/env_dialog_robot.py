@@ -135,8 +135,6 @@ class DialogRobot(QDialog):
 		self.txtVariableRobot.setText("")
 		self.txtValueRobot.setText("")
 
-
-
 	def click_btnSaveRobot(self):
 		if self.txtVariableRobot.text() == 'ROS_MASTER_URI':
 			parse = urlparse(self.txtValueRobot.text())
@@ -185,7 +183,8 @@ class DialogRobot(QDialog):
 		item = self.treeWidgetRobot.currentItem()
 		if reply == QMessageBox.Yes:
 			xml_dialog = DialogXml()
-			xml_dialog.remove_robot_variable(item.text(0),self.txtAlias.text().strip())
+			# xml_dialog.remove_robot_variable(item.text(0),self.txtAlias.text().strip())
+			xml_dialog.modify_deleted_status_variable(item.text(0),self.txtAlias.text().strip())
 			self.remove_selected_item_widgetTree()
 			self.txtVariableRobot.setText("")
 			self.txtValueRobot.setText("")
@@ -251,8 +250,6 @@ class DialogRobot(QDialog):
 	    for item in self.treeWidgetRobot.selectedItems():
 	        (item.parent() or root).removeChild(item)
 	       
-      
- 
 
 class TreeWidgetItem(QTreeWidgetItem):
     def __init__(self, topic_name, parent=None):
@@ -327,7 +324,21 @@ class DialogXml(object):
    				if node.attrib['id']==variable:
    					elem.remove(node) 
 		cpath = os.path.dirname(os.path.abspath(sys.argv[0]))+'/../resource/env.xml'
-		ET.ElementTree(self._root).write(cpath) 
+		ET.ElementTree(self._root).write(cpath)
+
+
+	def modify_deleted_status_variable(self,variable,alias):
+		self.openXml()
+		for elem in self._root.iter(tag='robot'):
+  			if elem.attrib["id"]==alias:
+  				for node in elem.iterfind('variable'):
+  					if node.attrib['name'] == variable:
+						node.set('deleted','1')
+		cpath = os.path.dirname(os.path.abspath(sys.argv[0]))+'/../resource/env.xml'
+		ET.ElementTree(self._root).write(cpath)
+
+
+	# def get_removed_variable_robot(self) 
 
 	
 

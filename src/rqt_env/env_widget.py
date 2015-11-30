@@ -11,6 +11,7 @@ import rospy
 from rospy.exceptions import ROSException
 from .env_dialog_robot import DialogRobot,DialogXml
 from .xml_info import XmlInfo 
+from .env_os import EnvOs
  
 
 
@@ -141,6 +142,8 @@ class EnvWidget(QWidget):
         # self.clear_checked()
         xml_info = XmlInfo()
         deleted_general_items = xml_info.get_deleted_general_variable()  #get deleted general items (deleted status = 1 in xml)
+        env_os = EnvOs()
+        env_os.parse_to_htbash()
         quit_msg = "Are you sure you want to Apply this configuration?"
         # reply = QMessageBox.question(self, 'Message', quit_msg, QMessageBox.Yes, QMessageBox.No)
         # if reply == QMessageBox.Yes:

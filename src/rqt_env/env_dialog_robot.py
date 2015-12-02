@@ -350,15 +350,18 @@ class DialogXml(object):
   							if child.attrib["deleted"]=="1":
   								c.add(child.attrib["name"])
 		return list(c)
-
-	def get_deleted_general_variable(self):
+  
+	def get_general_variable_robot(self):
 		l = []
 		self.openXml()
-  		for elem in self._root.iter(tag='general'):
-  			for node in elem.iterfind('variable'):
-  				if node.attrib['deleted'] == '1':
-  					l.append(node.attrib['name'])
-		return l 
+		for elem in self._root.iter(tag='robots'):
+  			for node in elem.iterfind('robot'):
+  					if node.attrib['status'] == "1":
+  						for child in node.iterfind("variable"):
+  							l.append((child.attrib['name'],child.attrib['value']))
+  							alias = node.attrib['id']
+  							# l.append(child.attrib['name']+" = "+child.attrib['value'])
+ 		return l,alias
 
 	
 

@@ -21,5 +21,21 @@ class EnvOs(object):
 			f.write("unset "+item+'\n')
 		f.close()
 		
-	def export_to_htbash(self):
-		pass
+	def export_to_general_htbash(self,list_variables):
+		cpath = os.path.dirname(os.path.abspath(sys.argv[0]))
+		cpath = '/'.join(cpath.split('/')[:3])+'/'
+		f=open(cpath+".htbash","a")
+		f.write('\n'+"#---variables ROS General------"+'\n')
+		for item in set(list_variables):
+			f.write("export "+item[0]+'='+item[1]+'\n')
+		f.close()
+
+	def export_to_robot_htbash(self,list_variables,alias):
+		cpath = os.path.dirname(os.path.abspath(sys.argv[0]))
+		cpath = '/'.join(cpath.split('/')[:3])+'/'
+		f=open(cpath+".htbash","a")
+		f.write('\n'+"#---variables Robot for "+alias+ " ----------"+'\n')
+		for item in list_variables:
+			f.write("export "+item[0]+'='+item[1]+'\n')
+		f.close()
+

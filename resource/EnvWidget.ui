@@ -269,6 +269,19 @@
     <string>Apply</string>
    </property>
   </widget>
+  <widget class="QLabel" name="lblmsg">
+   <property name="geometry">
+    <rect>
+     <x>200</x>
+     <y>530</y>
+     <width>411</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections/>

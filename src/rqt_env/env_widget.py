@@ -59,7 +59,10 @@ class EnvWidget(QWidget):
         #tree_widget ROBOT
         self.env_robot_tree_widget.sortByColumn(0, Qt.AscendingOrder)
         self.env_robot_tree_widget.setEditTriggers(self.env_robot_tree_widget.NoEditTriggers)
-        
+
+        self.env_robot_tree_widget.itemClicked.connect(self.check_status)
+ 
+      
         header_robot=self.env_robot_tree_widget.header()
         header_robot.setResizeMode(QHeaderView.ResizeToContents) 
         header_robot.setContextMenuPolicy(Qt.CustomContextMenu)
@@ -88,8 +91,6 @@ class EnvWidget(QWidget):
         self.txtVariableRos.setEnabled(False)
         self.txtValueRos.setEnabled(False)
 
-
-
         self._selected_topics = selected_topics
 
         self._current_topic_list = []
@@ -100,6 +101,14 @@ class EnvWidget(QWidget):
             self._column_index[column_name] = len(self._column_index)
 
         self.refresh_env()
+
+           
+
+    def check_status(self):
+        item1 = self.env_robot_tree_widget.currentItem()
+        if item1.checkState(0) == Qt.Checked:
+            print('item 1 is checked')
+      
 
     def click_tab_ros(self,i):
         if i == 0:
@@ -139,24 +148,30 @@ class EnvWidget(QWidget):
         
 
     def click_btn_apply(self):
-        # self.clear_checked()
-        xml_info = XmlInfo()
-        deleted_general_items = xml_info.get_deleted_general_variable()  #get deleted general items (deleted status = 1 in xml)
-        env_os = EnvOs()
-      
-        dialog_xml = DialogXml()
-        dialog_xml.get_deleted_variable_robot()
-        deleted_robots_items=dialog_xml.get_deleted_variable_robot()
-        env_os.unset_to_htbash(deleted_robots_items+deleted_robots_items)
-
-
-
+        self.clear_checked()
         quit_msg = "Are you sure you want to Apply this configuration?"
-        # reply = QMessageBox.question(self, 'Message', quit_msg, QMessageBox.Yes, QMessageBox.No)
-        # if reply == QMessageBox.Yes:
-        #     pass
-        # else:
-        #     pass
+        reply = QMessageBox.question(self, 'Message', quit_msg, QMessageBox.Yes, QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            xml_info = XmlInfo()
+            env_os = EnvOs()
+            dialog_xml = DialogXml()
+            deleted_general_items = xml_info.get_deleted_general_variable()  #get deleted general items (deleted status = 1 in xml)
+            variable_general_items = xml_info.get_general_varibale()
+            dialog_xml.get_deleted_variable_robot()
+            deleted_robots_items=dialog_xml.get_deleted_variable_robot()
+            variable_robot_items,active_robot=dialog_xml.get_general_variable_robot()
+            
+            for item in variable_general_items:   
+                xml_info.remove_general_variable(item)    
+            for item in deleted_robots_items:   
+                xml_info.remove_robot_list_variable(item) 
+            
+            env_os.unset_to_htbash(deleted_robots_items+deleted_robots_items)
+            env_os.export_to_general_htbash(variable_general_items)
+            env_os.export_to_robot_htbash(variable_robot_items,active_robot)
+            self.lblmsg.setText("write file .htbash successfully")
+        else:
+             pass
     
     def click_btn_new_ros(self): 
         self.btnNewRos.setEnabled(False)
@@ -382,8 +397,10 @@ class TreeWidgetItem(QTreeWidgetItem):
         self._topic_name = topic_name
         if status == '1':
             self.setCheckState(2, Qt.Checked)
+ 
         elif status == '0':
             self.setCheckState(2, Qt.Unchecked) 
+
 
     def setData(self, column, role, value):
         if role == Qt.CheckStateRole:

@@ -46,6 +46,7 @@ class XmlInfo(object):
   		for elem in self._root.iter(tag='general'):
    			for node in elem.iterfind('variable'):
    				for child in node.getiterator():
+   					print child.attrib['name']
    					if child.attrib['name']==variable:
    						elem.remove(node) 
 		cpath = os.path.dirname(os.path.abspath(sys.argv[0]))+'/../resource/env.xml'
@@ -58,8 +59,8 @@ class XmlInfo(object):
    				if node.attrib['id']==variable:
    					elem.remove(node) 
 		cpath = os.path.dirname(os.path.abspath(sys.argv[0]))+'/../resource/env.xml'
-		ET.ElementTree(self._root).write(cpath)
- 
+		ET.ElementTree(self._root).write(cpath
+) 
  	def add_variable_general(self,variable,value):
 		self.openXml()
 		for child in self._root:
@@ -91,4 +92,12 @@ class XmlInfo(object):
   				if node.attrib['deleted'] == '1':
   					l.append(node.attrib['name'])
 		return l 
+	def get_general_varibale(self):
+		l = []
+		self.openXml()
+  		for elem in self._root.iter(tag='general'):
+  			for node in elem.iterfind('variable'):
+  				if node.attrib['deleted'] == '0':
+  					l.append((node.attrib['name'],node.attrib['value']))
+  		return l
 

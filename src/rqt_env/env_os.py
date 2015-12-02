@@ -39,3 +39,23 @@ class EnvOs(object):
 			f.write("export "+item[0]+'='+item[1]+'\n')
 		f.close()
 
+	def is_include(self):
+		cpath = os.path.dirname(os.path.abspath(sys.argv[0]))
+		cpath = '/'.join(cpath.split('/')[:3])+'/'
+		f = open(cpath+".bashrc")
+		for line in f:
+			if line.strip() == 'source ~/.htbash':
+				f.close()
+				return True  
+		return False
+
+	def include_htbash(self):
+		if not self.is_include():
+			cpath = os.path.dirname(os.path.abspath(sys.argv[0]))
+			cpath = '/'.join(cpath.split('/')[:3])+'/'
+			f = open(cpath+".bashrc",'a')
+			f.write('source ~/.htbash')
+			f.close()
+
+
+

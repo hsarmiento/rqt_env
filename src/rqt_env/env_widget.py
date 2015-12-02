@@ -153,6 +153,7 @@ class EnvWidget(QWidget):
         
 
     def click_btn_apply(self):
+        
         if self.validate_checked():
             quit_msg = "Are you sure you want to Apply this configuration?"
             reply = QMessageBox.question(self, 'Message', quit_msg, QMessageBox.Yes, QMessageBox.No)
@@ -179,7 +180,7 @@ class EnvWidget(QWidget):
 
                 for item in deleted_general_items:   
                     xml_info.remove_general_variable(item)   
-                
+                env_os.include_htbash()
                 self.lblmsg.setText("write file .htbash successfully")
             else:
                  pass

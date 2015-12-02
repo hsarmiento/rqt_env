@@ -130,12 +130,17 @@ class EnvWidget(QWidget):
         # return True
 
 
-    def clear_checked(self):
+    def validate_checked(self):
         root = self.env_robot_tree_widget.invisibleRootItem()
         count = root.childCount()
+        select = 0
         for i in range(count):
             folder = root.child(i)
-            folder.setCheckState(2, Qt.Unchecked)
+            if folder.checkState(2) == 2:
+                select+=1
+        if select != 1:
+            return False
+        return True
     
     def validate_item(self, item=None):
         root = self.env_ros_tree_widget.invisibleRootItem()
@@ -148,36 +153,39 @@ class EnvWidget(QWidget):
         
 
     def click_btn_apply(self):
-        self.clear_checked()
-        quit_msg = "Are you sure you want to Apply this configuration?"
-        reply = QMessageBox.question(self, 'Message', quit_msg, QMessageBox.Yes, QMessageBox.No)
-        if reply == QMessageBox.Yes:
-            xml_info = XmlInfo()
-            env_os = EnvOs()
-            dialog_xml = DialogXml()
-            deleted_general_items = xml_info.get_deleted_general_variable()  #get deleted general items (deleted status = 1 in xml)
-            variable_general_items = xml_info.get_general_varibale()
-            dialog_xml.get_deleted_variable_robot()
-            deleted_robots_items=dialog_xml.get_deleted_variable_robot()
-            variable_robot_items,active_robot=dialog_xml.get_general_variable_robot()
-            
-            deleted_robot=dialog_xml.get_deleted_robot()
-            asociative_variable_robot = dialog_xml.get_asociative_robot_variable()
+        if self.validate_checked():
+            quit_msg = "Are you sure you want to Apply this configuration?"
+            reply = QMessageBox.question(self, 'Message', quit_msg, QMessageBox.Yes, QMessageBox.No)
+            if reply == QMessageBox.Yes:
+                xml_info = XmlInfo()
+                env_os = EnvOs()
+                dialog_xml = DialogXml()
+                deleted_general_items = xml_info.get_deleted_general_variable()  #get deleted general items (deleted status = 1 in xml)
+                variable_general_items = xml_info.get_general_varibale()
+                dialog_xml.get_deleted_variable_robot()
+                deleted_robots_items=dialog_xml.get_deleted_variable_robot()
+                variable_robot_items,active_robot=dialog_xml.get_general_variable_robot()
+                
+                deleted_robot=dialog_xml.get_deleted_robot()
+                asociative_variable_robot = dialog_xml.get_asociative_robot_variable()
 
-            env_os.unset_to_htbash(deleted_robots_items+deleted_robots_items)
-            env_os.export_to_general_htbash(variable_general_items)
-            env_os.export_to_robot_htbash(variable_robot_items,active_robot)
-            dialog_xml.remove_asociative_robot_variable(asociative_variable_robot)
+                env_os.unset_to_htbash(deleted_robots_items+deleted_robots_items)
+                env_os.export_to_general_htbash(variable_general_items)
+                env_os.export_to_robot_htbash(variable_robot_items,active_robot)
+                dialog_xml.remove_asociative_robot_variable(asociative_variable_robot)
 
-            for item in deleted_robot:
-                dialog_xml.remove_robot_list_variable(item)
+                for item in deleted_robot:
+                    dialog_xml.remove_robot_list_variable(item)
 
-            for item in deleted_general_items:   
-                xml_info.remove_general_variable(item)   
-            
-            self.lblmsg.setText("write file .htbash successfully")
+                for item in deleted_general_items:   
+                    xml_info.remove_general_variable(item)   
+                
+                self.lblmsg.setText("write file .htbash successfully")
+            else:
+                 pass
         else:
-             pass
+            QMessageBox.information(self, 'Checked validate',"You only must select one active robot")
+
     
     def click_btn_new_ros(self): 
         self.btnNewRos.setEnabled(False)

@@ -317,14 +317,19 @@ class DialogXml(object):
 		cpath = os.path.dirname(os.path.abspath(sys.argv[0]))+'/../resource/env.xml'
 		ET.ElementTree(self._root).write(cpath)
 
-	def remove_robot_list_variable(self,variable):
+	def remove_robot_list_variable(self,alias):
 		self.openXml()
   		for elem in self._root.iter(tag='robots'):
    			for node in elem.iterfind('robot'):
-   				if node.attrib['id']==variable:
+   				if node.attrib['id']==alias:
    					elem.remove(node) 
 		cpath = os.path.dirname(os.path.abspath(sys.argv[0]))+'/../resource/env.xml'
 		ET.ElementTree(self._root).write(cpath)
+
+	def remove_asociative_robot_variable(self,d):
+		for robot,variables in d.items():
+			for variable in variables:
+				self.remove_robot_variable(variable,robot)
 
 
 	def modify_deleted_status_variable(self,variable,alias):
@@ -350,7 +355,16 @@ class DialogXml(object):
   							if child.attrib["deleted"]=="1":
   								c.add(child.attrib["name"])
 		return list(c)
-  
+
+  	def get_deleted_robot(self):
+  		l = []
+  		self.openXml()
+		for elem in self._root.iter(tag='robots'):
+  			for node in elem.iterfind('robot'):
+  					if node.attrib['deleted'] == "1":
+						l.append(node.attrib['id'])
+		return l
+
 	def get_general_variable_robot(self):
 		l = []
 		self.openXml()
@@ -358,10 +372,24 @@ class DialogXml(object):
   			for node in elem.iterfind('robot'):
   					if node.attrib['status'] == "1":
   						for child in node.iterfind("variable"):
-  							l.append((child.attrib['name'],child.attrib['value']))
-  							alias = node.attrib['id']
-  							# l.append(child.attrib['name']+" = "+child.attrib['value'])
+  							if child.attrib['deleted'] == "0":
+	  							l.append((child.attrib['name'],child.attrib['value']))
+	  							alias = node.attrib['id']
  		return l,alias
+
+
+ 	def get_asociative_robot_variable(self):
+ 		d = {}
+		self.openXml()
+		for elem in self._root.iter(tag='robots'):
+  			for node in elem.iterfind('robot'):
+  					if node.attrib['deleted'] == "0":
+						for child in node.iterfind("variable"):
+  							if child.attrib["deleted"]=="1":
+  								if node.attrib['id'] not in d:
+  									d[node.attrib['id']] = set()
+  								d[node.attrib['id']].add(child.attrib["name"])
+		return d
 
 	
 

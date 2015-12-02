@@ -161,14 +161,20 @@ class EnvWidget(QWidget):
             deleted_robots_items=dialog_xml.get_deleted_variable_robot()
             variable_robot_items,active_robot=dialog_xml.get_general_variable_robot()
             
-            for item in variable_general_items:   
-                xml_info.remove_general_variable(item)    
-            for item in deleted_robots_items:   
-                xml_info.remove_robot_list_variable(item) 
-            
+            deleted_robot=dialog_xml.get_deleted_robot()
+            asociative_variable_robot = dialog_xml.get_asociative_robot_variable()
+
             env_os.unset_to_htbash(deleted_robots_items+deleted_robots_items)
             env_os.export_to_general_htbash(variable_general_items)
             env_os.export_to_robot_htbash(variable_robot_items,active_robot)
+            dialog_xml.remove_asociative_robot_variable(asociative_variable_robot)
+
+            for item in deleted_robot:
+                dialog_xml.remove_robot_list_variable(item)
+
+            for item in deleted_general_items:   
+                xml_info.remove_general_variable(item)   
+            
             self.lblmsg.setText("write file .htbash successfully")
         else:
              pass

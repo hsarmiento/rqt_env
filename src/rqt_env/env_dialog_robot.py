@@ -27,13 +27,10 @@ class DialogRobot(QDialog):
 		self.treeWidgetRobot.sortByColumn(0, Qt.AscendingOrder)
 		self.treeWidgetRobot.setEditTriggers(self.treeWidgetRobot.NoEditTriggers)
 		self.treeWidgetRobot.clicked.connect(self.click_row)
- 
- 
-		# self.treeWidget.clicked.connect(self.show_click_row)
+
 		header_robot=self.treeWidgetRobot.header()
 		header_robot.setResizeMode(QHeaderView.ResizeToContents) 
 		header_robot.setContextMenuPolicy(Qt.CustomContextMenu)
-		# self.btnRemoveRobot.clicked.connect(self.click_btnRemoveRobot)
 		self.txtAlias.setText(self._alias)
 
 		#clicked buttons robots
@@ -55,7 +52,6 @@ class DialogRobot(QDialog):
 
 		self.connect(self, SIGNAL('triggered()'), self.closeEvent)
 
-	
 	def click_row(self):
 		self.btnRemoveRobot.setEnabled(True)
 		self.txtVariableRobot.setEnabled(False)
@@ -70,17 +66,17 @@ class DialogRobot(QDialog):
 
 	def closeEvent(self, event):
 		uri,hostname = self.validate_uri_hostname()
-		# if uri and hostname:
-		# 	self.destroy()
-		# elif not uri and not hostname:
-		# 	event.ignore()
-		# 	QMessageBox.information(self, 'ROS_HOSTNAME and ROS_MASTER_URI not exists',"You must add ROS_HOSTNAME AND ROS_MASTER_URI to initial variables")
-		# elif not uri:
-		# 	event.ignore()
-		# 	QMessageBox.information(self, 'ROS_MASTER_URI not exists',"You must add ROS_MASTER_URI to initial variables")
-		# elif not hostname:
-		# 	event.ignore()
-		# 	QMessageBox.information(self, 'ROS_HOSTNAME not exists',"You must add ROS_HOSTNAME to initial variables")
+		if uri and hostname:
+			self.destroy()
+		elif not uri and not hostname:
+			event.ignore()
+			QMessageBox.information(self, 'ROS_HOSTNAME and ROS_MASTER_URI not exists',"You must add ROS_HOSTNAME AND ROS_MASTER_URI to initial variables")
+		elif not uri:
+			event.ignore()
+			QMessageBox.information(self, 'ROS_MASTER_URI not exists',"You must add ROS_MASTER_URI to initial variables")
+		elif not hostname:
+			event.ignore()
+			QMessageBox.information(self, 'ROS_HOSTNAME not exists',"You must add ROS_HOSTNAME to initial variables")
 
   	def validate_uri_hostname(self):
 	    root = self.treeWidgetRobot.invisibleRootItem()
@@ -115,14 +111,6 @@ class DialogRobot(QDialog):
 		else:
 			return True
 		return False
-
-  # def show_click_row(self):
-  #       self.btnRemoveRobot.setEnabled(True)
-  #       self.txtVariableRobot.setEnabled(True)
-  #       self.txtValueRobot.setEnabled(True)
-  #       item = self.treeWidgetRobot.currentItem()
-  #       self.txtVariableRobot.setText(item.text(0))
-  #       self.txtValueRobot.setText(item.text(1))
 
 	def click_btn_add_robot(self):
 		self.btnAddRobot.setEnabled(False)
@@ -183,7 +171,6 @@ class DialogRobot(QDialog):
 		item = self.treeWidgetRobot.currentItem()
 		if reply == QMessageBox.Yes:
 			xml_dialog = DialogXml()
-			# xml_dialog.remove_robot_variable(item.text(0),self.txtAlias.text().strip())
 			xml_dialog.modify_deleted_status_variable(item.text(0),self.txtAlias.text().strip())
 			self.remove_selected_item_widgetTree()
 			self.txtVariableRobot.setText("")
@@ -192,8 +179,6 @@ class DialogRobot(QDialog):
 			self.btnRemoveRobot.setEnabled(False)
 			self.btnAddRobot.setEnabled(True)
 			self.btnAddRobot.setFocus()
-		else:
-		    pass
 
 	def click_btnCancelRobot(self):
 		self.txtVariableRobot.setText("")
@@ -220,11 +205,8 @@ class DialogRobot(QDialog):
 	    robot_variables = xml_dialog.getRobotVariables(self._alias)
 	    new_topics = {}
 	    for variable_name, variable_value in robot_variables:
-	            # if topic is new or has changed its type
 	        if variable_name not in self._variables or \
 	           self._variables[variable_name]['variable'] != variable_value:
-	            # create new TopicInfo
-	            topic_info = 'ss'#opicInfo(topic_name, topic_type)
 	            message_instance = None
 	            variable_item = self._recursive_create_widget_items(self.treeWidgetRobot, variable_name, variable_value, message_instance)
 	            new_topics[variable_name] = {
@@ -233,13 +215,10 @@ class DialogRobot(QDialog):
 	            }
 
 	        else:
-	            # if topic has been seen before, copy it to new dict and
-	            # remove it from the old one
 	            new_topics[variable_name] = self._topics[variable_name]
 	            del self._topics[variable_name]
 
 	def _recursive_create_widget_items(self, parent, variable_name, variable_value, message):
-	    # topic_text = variable_name
 	    item = TreeWidgetItem(variable_name, parent)
 	    item.setText(self._column_index['variable'], variable_name)
 	    item.setText(self._column_index['value'], variable_value) 
@@ -256,7 +235,6 @@ class TreeWidgetItem(QTreeWidgetItem):
         super(TreeWidgetItem, self).__init__(parent)
         self._topic_name = topic_name
 
-
 class DialogXml(object):
 	def __init__(self):
 		self._root = None
@@ -270,7 +248,8 @@ class DialogXml(object):
 		for elem in self._root.iter(tag='robot'):
 	 		if elem.attrib['id']==alias:
 				for node in elem.iterfind('variable'):
-					l.append([node.attrib['name'],node.attrib['value']])
+					if node.attrib['deleted'] == '0':
+						l.append([node.attrib['name'],node.attrib['value']])
 		return l
 
 	def add_variable_robot(self,alias,variable,value):

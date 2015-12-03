@@ -59,8 +59,7 @@ class EnvWidget(QWidget):
         #tree_widget ROBOT
         self.env_robot_tree_widget.sortByColumn(0, Qt.AscendingOrder)
         self.env_robot_tree_widget.setEditTriggers(self.env_robot_tree_widget.NoEditTriggers)
-
-        self.env_robot_tree_widget.itemClicked.connect(self.check_status)
+ 
  
       
         header_robot=self.env_robot_tree_widget.header()
@@ -79,7 +78,6 @@ class EnvWidget(QWidget):
         #clicked buttons robots
         self.btnAddRobot.clicked.connect(self.click_btnAddRobot)
         self.btnDetailsRobot.clicked.connect(self.click_btnDetailsRobot)
-        self.btnSaveRobot.clicked.connect(self.click_btnSaveRobot)
         self.btnRemoveRobot.clicked.connect(self.click_btnRemoveRobot)
 
         #clicked tabs
@@ -99,16 +97,7 @@ class EnvWidget(QWidget):
         self._column_index = {}
         for column_name in self._column_names:
             self._column_index[column_name] = len(self._column_index)
-
         self.refresh_env()
-
-           
-
-    def check_status(self):
-        item1 = self.env_robot_tree_widget.currentItem()
-        if item1.checkState(0) == Qt.Checked:
-            print('item 1 is checked')
-      
 
     def click_tab_ros(self,i):
         if i == 0:
@@ -141,6 +130,21 @@ class EnvWidget(QWidget):
         if select != 1:
             return False
         return True
+
+    def get_selected_robot_checked(self):
+        root = self.env_robot_tree_widget.invisibleRootItem()
+        xml_info = XmlInfo()
+
+        count = root.childCount()
+        for i in range(count):
+            folder = root.child(i)
+            if folder.checkState(2) == 2:
+                xml_info.save_selected_robot(folder.text(0),'1')
+                alias=folder.text(0)
+            else:
+                xml_info.save_selected_robot(folder.text(0),'0')
+
+        return alias
     
     def validate_item(self, item=None):
         root = self.env_ros_tree_widget.invisibleRootItem()
@@ -157,6 +161,7 @@ class EnvWidget(QWidget):
         if self.validate_checked():
             quit_msg = "Are you sure you want to Apply this configuration?"
             reply = QMessageBox.question(self, 'Message', quit_msg, QMessageBox.Yes, QMessageBox.No)
+            self.get_selected_robot_checked()
             if reply == QMessageBox.Yes:
                 xml_info = XmlInfo()
                 env_os = EnvOs()
@@ -166,15 +171,12 @@ class EnvWidget(QWidget):
                 dialog_xml.get_deleted_variable_robot()
                 deleted_robots_items=dialog_xml.get_deleted_variable_robot()
                 variable_robot_items,active_robot=dialog_xml.get_general_variable_robot()
-                
                 deleted_robot=dialog_xml.get_deleted_robot()
                 asociative_variable_robot = dialog_xml.get_asociative_robot_variable()
-
                 env_os.unset_to_htbash(deleted_robots_items+deleted_robots_items)
                 env_os.export_to_general_htbash(variable_general_items)
                 env_os.export_to_robot_htbash(variable_robot_items,active_robot)
                 dialog_xml.remove_asociative_robot_variable(asociative_variable_robot)
-
                 for item in deleted_robot:
                     dialog_xml.remove_robot_list_variable(item)
 
@@ -232,7 +234,6 @@ class EnvWidget(QWidget):
         if reply == QMessageBox.Yes:
             xml_info = XmlInfo()
             xml_info.modify_deleted_status_general_variable(item.text(0))
-            # xml_info.remove_general_variable(item.text(0))   #not yet, just apply when apply button is clicked
             self.remove_Selected_Item_WidgetTree_ros()
             self.txtVariableRos.setText("")
             self.txtValueRos.setText("")
@@ -240,9 +241,6 @@ class EnvWidget(QWidget):
             self.btnRemoveRos.setEnabled(False)
             self.btnNewRos.setFocus()
             self.btnSaveRos.setEnabled(False)
-
-        else:
-            pass
 
     def click_btn_cancel_ros(self):
         self.txtVariableRos.setText("")
@@ -266,21 +264,17 @@ class EnvWidget(QWidget):
             q.exec_()
             self.env_robot_tree_widget.clear()
             self.refresh_env()
-
-    def click_btnSaveRobot(self):
-        pass
-
+    
     def click_btnRemoveRobot(self):
-      
         quit_msg = "Are you sure you want to remove this element?"
         reply = QMessageBox.question(self, 'Message', quit_msg, QMessageBox.Yes, QMessageBox.No)
         item = self.env_robot_tree_widget.currentItem()
         if reply == QMessageBox.Yes:
             xml_info = XmlInfo()
-            xml_info.remove_robot_list_variable(item.text(0))
+
+            #xml_info.remove_robot_list_variable(item.text(0))
+            xml_info.modify_deleted_robot_list_variable(item.text(0))
             self.removeSelectedItemWidgetTree()
-        else:
-            pass
 
     def remove_Selected_Item_WidgetTree_ros(self):
         root = self.env_ros_tree_widget.invisibleRootItem()
@@ -292,19 +286,8 @@ class EnvWidget(QWidget):
         for item in self.env_robot_tree_widget.selectedItems():
             (item.parent() or root).removeChild(item)
  
-    def get_selected_item(self,tree_widget):
-        pass
-        # root = tree_widget.invisibleRootItem()
-        # print tree_widget.selectedItems()
-
     def set_topic_specifier(self, specifier):
         self._select_topic_type = specifier
-
-    def start(self):
-        """
-        This method needs to be called to start updating topic pane.
-        """
-        self._timer_refresh_topics.start(1000)
 
     # @Slot()
     def refresh_env(self):
@@ -393,18 +376,6 @@ class EnvWidget(QWidget):
         rospy.logdebug('set_selected_topics topics={}'.format(len(selected_topics)))
         self._selected_topics = selected_topics
 
-    # TODO(Enhancement) Save/Restore tree expansion state
-    def save_settings(self, plugin_settings, instance_settings):
-        header_state = self.env_ros_tree_widget.header().saveState()
-        instance_settings.set_value('tree_widget_header_state', header_state)
-
-    def restore_settings(self, pluggin_settings, instance_settings):
-        if instance_settings.contains('tree_widget_header_state'):
-            header_state = instance_settings.value('tree_widget_header_state')
-            if not self.env_ros_tree_widget.header().restoreState(header_state):
-                rospy.logwarn("rqt_topic: Failed to restore header state.")
-
-
 class TreeWidgetItem(QTreeWidgetItem):
     def __init__(self, check_state_changed_callback, topic_name, parent=None,status=None):
         super(TreeWidgetItem, self).__init__(parent)
@@ -412,7 +383,6 @@ class TreeWidgetItem(QTreeWidgetItem):
         self._topic_name = topic_name
         if status == '1':
             self.setCheckState(2, Qt.Checked)
- 
         elif status == '0':
             self.setCheckState(2, Qt.Unchecked) 
 
@@ -421,8 +391,6 @@ class TreeWidgetItem(QTreeWidgetItem):
         if role == Qt.CheckStateRole:
             state = self.checkState(column)
         super(TreeWidgetItem, self).setData(column, role, value)
-        #if role == Qt.CheckStateRole and state != self.checkState(column):
-         #   self._check_state_changed_callback(self._topic_name)
 
 
 

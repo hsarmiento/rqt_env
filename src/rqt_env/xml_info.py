@@ -46,12 +46,29 @@ class XmlInfo(object):
   		for elem in self._root.iter(tag='general'):
    			for node in elem.iterfind('variable'):
    				for child in node.getiterator():
-   					print child.attrib['name']
    					if child.attrib['name']==variable:
    						elem.remove(node) 
 		cpath = os.path.dirname(os.path.abspath(sys.argv[0]))+'/../resource/env.xml'
 		ET.ElementTree(self._root).write(cpath)
 	
+	def save_selected_robot(self,alias,value):
+		self.openXml()
+  		for elem in self._root.iter(tag='robots'):
+   			for node in elem.iterfind('robot'):
+   				if node.attrib['id']==alias:
+   					node.set('status',value)
+		cpath = os.path.dirname(os.path.abspath(sys.argv[0]))+'/../resource/env.xml'
+		ET.ElementTree(self._root).write(cpath)
+
+	def modify_deleted_robot_list_variable(self,alias):
+		self.openXml()
+  		for elem in self._root.iter(tag='robots'):
+   			for node in elem.iterfind('robot'):
+   				if node.attrib['id']==alias:
+   					node.set('deleted','1')
+		cpath = os.path.dirname(os.path.abspath(sys.argv[0]))+'/../resource/env.xml'
+		ET.ElementTree(self._root).write(cpath)
+
 	def remove_robot_list_variable(self,variable):
 		self.openXml()
   		for elem in self._root.iter(tag='robots'):
@@ -59,8 +76,7 @@ class XmlInfo(object):
    				if node.attrib['id']==variable:
    					elem.remove(node) 
 		cpath = os.path.dirname(os.path.abspath(sys.argv[0]))+'/../resource/env.xml'
-		ET.ElementTree(self._root).write(cpath
-) 
+		ET.ElementTree(self._root).write(cpath) 
  	def add_variable_general(self,variable,value):
 		self.openXml()
 		for child in self._root:

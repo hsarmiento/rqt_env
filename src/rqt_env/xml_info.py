@@ -25,9 +25,13 @@ class XmlInfo(object):
 		l = []
 		for elem in self._root.iter(tag='robot'):
 			if elem.attrib['deleted'] == '0':
+				t = [elem.attrib['id'],None,None,elem.attrib['status']]
 				for node in elem.iterfind('variable'):
 					if node.attrib['name'] == 'ROS_MASTER_URI':
-						l.append([elem.attrib['id'],node.attrib['value'],elem.attrib['status']])
+						t[1] = node.attrib['value']
+					if node.attrib['name'] == 'ROS_HOSTNAME':
+						t[2] = node.attrib['value']
+				l.append(t)
 		return l
 	
 

@@ -28,7 +28,8 @@ class EnvWidget(QWidget):
     _column_names = ['topic', 'type', 'bandwidth', 'rate', 'value']
     #_column_names = ['variable', 'value']
     #_column_names_robot=['name','ip','status']
-    _column_names_robot = ['topic', 'type', 'bandwidth', 'rate', 'value']
+    # _column_names_robot = ['topic', 'type', 'bandwidth', 'rate', 'value']
+    _column_names_robot = ['alias','ROS_MASTER_URI','ROS_HOSTNAME','Status']
     def __init__(self, plugin=None, selected_topics=None, select_topic_type=SELECT_BY_NAME):
         """
         @type selected_topics: list of tuples.
@@ -125,7 +126,7 @@ class EnvWidget(QWidget):
         select = 0
         for i in range(count):
             folder = root.child(i)
-            if folder.checkState(2) == 2:
+            if folder.checkState(3) == 2:
                 select+=1
         if select != 1:
             return False
@@ -138,7 +139,7 @@ class EnvWidget(QWidget):
         count = root.childCount()
         for i in range(count):
             folder = root.child(i)
-            if folder.checkState(2) == 2:
+            if folder.checkState(3) == 2:
                 xml_info.save_selected_robot(folder.text(0),'1')
                 alias=folder.text(0)
             else:
@@ -295,7 +296,6 @@ class EnvWidget(QWidget):
         self._xml_info.openXml()
         general_list = self._xml_info.getGeneralVariables()
         robots_list = self._xml_info.getRobots()
-        # topic_list= [['TURTLEBOT_BASE', 'kobuki'], ['ROS_HOSTNAME', 'localhost']]
         new_topics = {}
         for topic_name, topic_type in general_list:
                 # if topic is new or has changed its type
@@ -318,14 +318,14 @@ class EnvWidget(QWidget):
                 del self._topics[topic_name]
 
         new_topics_robots = {}
-        for topic_name, topic_type,status in robots_list:
+        for topic_name, topic_type,topic_host,status in robots_list:
                 # if topic is new or has changed its type
             if topic_name not in self._topics or \
                self._topics[topic_name]['type'] != topic_type:
                 # create new TopicInfo
                 topic_info = 'ss'#opicInfo(topic_name, topic_type)
                 message_instance = None
-                topic_item = self._recursive_create_widget_items(self.env_robot_tree_widget, topic_name, topic_type, message_instance,status)
+                topic_item = self._recursive_create_widget_items(self.env_robot_tree_widget, topic_name, topic_type, message_instance,status,topic_host)
                 new_topics_robots[topic_name] = {
                    'item': topic_item,
                    'info': topic_info,
@@ -338,12 +338,13 @@ class EnvWidget(QWidget):
                 new_topics_robots[topic_name] = self._topics[topic_name]
                 del self._topics[topic_name]
 
-    def _recursive_create_widget_items(self, parent, topic_name, type_name, message,status=None):
+    def _recursive_create_widget_items(self, parent, topic_name, type_name, message,status=None, ros_hostname = None):
         
         topic_text = topic_name
-        item = TreeWidgetItem(self._toggle_monitoring, topic_name, parent,status)
+        item = TreeWidgetItem(self._toggle_monitoring, topic_name, parent,status,ros_hostname)
         item.setText(self._column_index['topic'], topic_text)
         item.setText(self._column_index['type'], type_name) 
+        item.setText(self._column_index['bandwidth'],ros_hostname)
         return item
 
     def _toggle_monitoring(self, topic_name):
@@ -366,7 +367,6 @@ class EnvWidget(QWidget):
     def shutdown_plugin(self):
         for topic in self._topics.values():
             topic['info'].stop_monitoring()
-        #self._timer_refresh_topics.stop()
 
     def set_selected_topics(self, selected_topics):
         """
@@ -377,14 +377,14 @@ class EnvWidget(QWidget):
         self._selected_topics = selected_topics
 
 class TreeWidgetItem(QTreeWidgetItem):
-    def __init__(self, check_state_changed_callback, topic_name, parent=None,status=None):
+    def __init__(self, check_state_changed_callback, topic_name, parent=None,status=None, ros_hostname=None):
         super(TreeWidgetItem, self).__init__(parent)
         self._check_state_changed_callback = check_state_changed_callback
         self._topic_name = topic_name
         if status == '1':
-            self.setCheckState(2, Qt.Checked)
+            self.setCheckState(3, Qt.Checked)
         elif status == '0':
-            self.setCheckState(2, Qt.Unchecked) 
+            self.setCheckState(3, Qt.Unchecked) 
 
 
     def setData(self, column, role, value):

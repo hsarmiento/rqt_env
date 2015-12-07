@@ -170,14 +170,22 @@
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
        <widget class="QTreeWidget" name="env_robot_tree_widget">
+        <attribute name="headerMinimumSectionSize">
+         <number>100</number>
+        </attribute>
         <column>
          <property name="text">
-          <string>Name</string>
+          <string>Alias</string>
          </property>
         </column>
         <column>
          <property name="text">
-          <string>IP</string>
+          <string>ROS_MASTER_URI</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>ROS_HOSTNAME</string>
          </property>
         </column>
         <column>

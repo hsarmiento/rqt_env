@@ -168,7 +168,7 @@ class EnvWidget(QWidget):
                 env_os = EnvOs()
                 dialog_xml = DialogXml()
                 deleted_general_items = xml_info.get_deleted_general_variable()  #get deleted general items (deleted status = 1 in xml)
-                variable_general_items = xml_info.get_general_varibale()
+                variable_general_items = xml_info.get_general_variables()
                 dialog_xml.get_deleted_variable_robot()
                 deleted_robots_items=dialog_xml.get_deleted_variable_robot()
                 variable_robot_items,active_robot=dialog_xml.get_general_variable_robot()
@@ -180,7 +180,6 @@ class EnvWidget(QWidget):
                 dialog_xml.remove_asociative_robot_variable(asociative_variable_robot)
                 for item in deleted_robot:
                     dialog_xml.remove_robot_list_variable(item)
-
                 for item in deleted_general_items:   
                     xml_info.remove_general_variable(item)   
                 env_os.include_htbash()

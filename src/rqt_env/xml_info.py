@@ -12,6 +12,7 @@ class XmlInfo(object):
 		self.rp =rospkg.RosPack()
 
 	def openXml(self):
+		# cpath = os.path.join(self.rp.get_path('rqt_env'),'test','env_test.xml') #for testing
 		cpath = os.path.join(self.rp.get_path('rqt_env'),'resource','env.xml') 
 		self._root = ET.parse(cpath).getroot()
 
@@ -114,7 +115,8 @@ class XmlInfo(object):
   				if node.attrib['deleted'] == '1':
   					l.append(node.attrib['name'])
 		return l 
-	def get_general_varibale(self):
+
+	def get_general_variables(self):
 		l = []
 		self.openXml()
   		for elem in self._root.iter(tag='general'):

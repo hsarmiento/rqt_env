@@ -3,14 +3,16 @@ import xml.etree.ElementTree as ET
 import os
 import sys
 from xml.dom import minidom
+import rospkg
 
 class XmlInfo(object):
 	
 	def __init__(self):
 		self._root = None
+		self.rp =rospkg.RosPack()
 
 	def openXml(self):
-		cpath = os.path.dirname(os.path.abspath(sys.argv[0]))+'/../resource/env.xml' 
+		cpath = os.path.join(self.rp.get_path('rqt_env'),'resource','env.xml') 
 		self._root = ET.parse(cpath).getroot()
 
 	def getGeneralVariables(self):
@@ -42,7 +44,7 @@ class XmlInfo(object):
    				for child in node.getiterator():
    					if child.attrib['name']==variable:
    						child.set('deleted','1')
-		cpath = os.path.dirname(os.path.abspath(sys.argv[0]))+'/../resource/env.xml'
+		cpath = os.path.join(self.rp.get_path('rqt_env'),'resource','env.xml') 
 		ET.ElementTree(self._root).write(cpath)
 
 	def remove_general_variable(self,variable):
@@ -52,7 +54,7 @@ class XmlInfo(object):
    				for child in node.getiterator():
    					if child.attrib['name']==variable:
    						elem.remove(node) 
-		cpath = os.path.dirname(os.path.abspath(sys.argv[0]))+'/../resource/env.xml'
+		cpath = os.path.join(self.rp.get_path('rqt_env'),'resource','env.xml') 
 		ET.ElementTree(self._root).write(cpath)
 	
 	def save_selected_robot(self,alias,value):
@@ -61,7 +63,7 @@ class XmlInfo(object):
    			for node in elem.iterfind('robot'):
    				if node.attrib['id']==alias:
    					node.set('status',value)
-		cpath = os.path.dirname(os.path.abspath(sys.argv[0]))+'/../resource/env.xml'
+		cpath = os.path.join(self.rp.get_path('rqt_env'),'resource','env.xml') 
 		ET.ElementTree(self._root).write(cpath)
 
 	def modify_deleted_robot_list_variable(self,alias):
@@ -70,7 +72,7 @@ class XmlInfo(object):
    			for node in elem.iterfind('robot'):
    				if node.attrib['id']==alias:
    					node.set('deleted','1')
-		cpath = os.path.dirname(os.path.abspath(sys.argv[0]))+'/../resource/env.xml'
+		cpath = os.path.join(self.rp.get_path('rqt_env'),'resource','env.xml') 
 		ET.ElementTree(self._root).write(cpath)
 
 	def remove_robot_list_variable(self,variable):
@@ -79,7 +81,7 @@ class XmlInfo(object):
    			for node in elem.iterfind('robot'):
    				if node.attrib['id']==variable:
    					elem.remove(node) 
-		cpath = os.path.dirname(os.path.abspath(sys.argv[0]))+'/../resource/env.xml'
+		cpath = os.path.join(self.rp.get_path('rqt_env'),'resource','env.xml') 
 		ET.ElementTree(self._root).write(cpath) 
  	def add_variable_general(self,variable,value):
 		self.openXml()
@@ -87,7 +89,7 @@ class XmlInfo(object):
 			if child.tag == "general":
 					new_element = ET.Element('variable',{'name':variable,'value':value,'deleted':'0'})
 					child.append(new_element)
-		cpath = os.path.dirname(os.path.abspath(sys.argv[0]))+'/../resource/env.xml'
+		cpath = os.path.join(self.rp.get_path('rqt_env'),'resource','env.xml') 
 		ET.ElementTree(self._root).write(cpath)
 		xml = minidom.parse(cpath)
 		pretty_xml_as_string = xml.toprettyxml()
@@ -101,7 +103,7 @@ class XmlInfo(object):
   			for node in elem.iterfind('variable'):
 				if node.attrib['name'] == variable:
 					node.set('value',value)
-		cpath = os.path.dirname(os.path.abspath(sys.argv[0]))+'/../resource/env.xml'
+		cpath = os.path.join(self.rp.get_path('rqt_env'),'resource','env.xml') 
 		ET.ElementTree(self._root).write(cpath)
 
 	def get_deleted_general_variable(self):

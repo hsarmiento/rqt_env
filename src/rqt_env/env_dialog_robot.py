@@ -21,8 +21,8 @@ class DialogRobot(QDialog):
 		super(DialogRobot,self).__init__()
 		self._alias = alias
 		self._temp_alias = alias
-		rp = rospkg.RosPack()
-		ui_file = os.path.join(rp.get_path('rqt_env'), 'resource', 'NewRobotDialog.ui')
+		self.rp =rospkg.RosPack()
+		ui_file = os.path.join(self.rp.get_path('rqt_env'), 'resource', 'NewRobotDialog.ui')
 		loadUi(ui_file, self)
 		self.treeWidgetRobot.sortByColumn(0, Qt.AscendingOrder)
 		self.treeWidgetRobot.setEditTriggers(self.treeWidgetRobot.NoEditTriggers)
@@ -209,10 +209,10 @@ class DialogRobot(QDialog):
 	           self._variables[variable_name]['variable'] != variable_value:
 	            message_instance = None
 	            variable_item = self._recursive_create_widget_items(self.treeWidgetRobot, variable_name, variable_value, message_instance)
-	            new_topics[variable_name] = {
-	               'item': variable_item,
-	               'value': variable_value,
-	            }
+	            # new_topics[variable_name] = {
+	            #    'item': variable_item,
+	            #    'value': variable_value,
+	            # }
 
 	        else:
 	            new_topics[variable_name] = self._topics[variable_name]
@@ -238,9 +238,10 @@ class TreeWidgetItem(QTreeWidgetItem):
 class DialogXml(object):
 	def __init__(self):
 		self._root = None
+		self.rp =rospkg.RosPack()
 
 	def openXml(self):
-		cpath = os.path.dirname(os.path.abspath(sys.argv[0]))+'/../resource/env.xml' 
+		cpath = os.path.join(self.rp.get_path('rqt_env'),'resource','env.xml') 
 		self._root = ET.parse(cpath).getroot()
 
 	def getRobotVariables(self,alias):
@@ -265,9 +266,9 @@ class DialogXml(object):
 				if child.tag == "robots":
 						new_element = ET.Element('robot',{'id':alias,'status':'1','deleted':'0'})
 						subElem = ET.SubElement(new_element, "variable", {'deleted':'0','name':variable,'value':value})
-						ET.dump(new_element)
+						#ET.dump(new_element)
 						child.append(new_element)
-		cpath = os.path.dirname(os.path.abspath(sys.argv[0]))+'/../resource/env.xml'
+		cpath = os.path.join(self.rp.get_path('rqt_env'),'resource','env.xml') 
 		ET.ElementTree(self._root).write(cpath)
 		xml = minidom.parse(cpath)
 		pretty_xml_as_string = xml.toprettyxml()
@@ -282,7 +283,7 @@ class DialogXml(object):
   				for node in elem.iterfind('variable'):
   					if node.attrib['name'] == variable:
 						node.set('value',value)
-		cpath = os.path.dirname(os.path.abspath(sys.argv[0]))+'/../resource/env.xml'
+		cpath = os.path.join(self.rp.get_path('rqt_env'),'resource','env.xml') 
 		ET.ElementTree(self._root).write(cpath)
 
 	def remove_robot_variable(self,variable,alias):
@@ -293,7 +294,7 @@ class DialogXml(object):
    					for child in node.getiterator():
    						if child.attrib['name']==variable:
    							elem.remove(node) 
-		cpath = os.path.dirname(os.path.abspath(sys.argv[0]))+'/../resource/env.xml'
+		cpath = os.path.join(self.rp.get_path('rqt_env'),'resource','env.xml') 
 		ET.ElementTree(self._root).write(cpath)
 
 	def remove_robot_list_variable(self,alias):
@@ -302,7 +303,7 @@ class DialogXml(object):
    			for node in elem.iterfind('robot'):
    				if node.attrib['id']==alias:
    					elem.remove(node) 
-		cpath = os.path.dirname(os.path.abspath(sys.argv[0]))+'/../resource/env.xml'
+		cpath = os.path.join(self.rp.get_path('rqt_env'),'resource','env.xml') 
 		ET.ElementTree(self._root).write(cpath)
 
 	def remove_asociative_robot_variable(self,d):
@@ -318,7 +319,7 @@ class DialogXml(object):
   				for node in elem.iterfind('variable'):
   					if node.attrib['name'] == variable:
 						node.set('deleted','1')
-		cpath = os.path.dirname(os.path.abspath(sys.argv[0]))+'/../resource/env.xml'
+		cpath = os.path.join(self.rp.get_path('rqt_env'),'resource','env.xml') 
 		ET.ElementTree(self._root).write(cpath)
 
 	def get_deleted_variable_robot(self):

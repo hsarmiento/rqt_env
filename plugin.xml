@@ -4,16 +4,14 @@
       A Python GUI Plugin for Environment variables configuration
     </description>
     <qtgui>
-      <!-- optional grouping...
+      optional grouping...
       <group>
-        <label>Group</label>
+        <label>Visualization</label>
+        <icon type ="theme">folder</icon>
       </group>
-      <group>
-        <label>Subgroup</label>
-      </group>
-      -->
+      
       <label>Enviroment Variables Configuration</label>
-      <icon type="theme">system-search</icon>
+      <icon type="theme">terminal</icon>
       <statustip>A Python GUI Plugin for Environment variables configuration</statustip>
     </qtgui>
   </class>

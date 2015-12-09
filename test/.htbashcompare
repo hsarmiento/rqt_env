@@ -1,0 +1,9 @@
+
+#---variables ROS General------
+export FOOBAR1=ABC
+export TEST2=AAB
+
+#---variables Robot for testrobot ----------
+export TEST_CIRCLE=123
+export TEST_MAP=BAR
+export TEST_MASTER_URI=http://100.100.100.100

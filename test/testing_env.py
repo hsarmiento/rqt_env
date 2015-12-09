@@ -40,42 +40,41 @@ class TestingEnv(unittest.TestCase):
 		list_test = xml_info.getRobots()
 		list_test.sort()
 		list_ok.sort()
-		self.assertEqual(list_ok,list_test)
+		self.assertEqual(list_ok,list_test) 
+		
 
+	def assertFiles(self,first,second):
+		file1 = open(first)
+		file2 = open(second)
+		i = 0
+		j = 0
+		for line1 in file1:
+			for line2 in file2:
+				print line1
+				print line2
+				if line1 != line2:
+					
+					file1.close()
+					file2.close()
+					return False 
+				j+=1
+				break
+			i+=1
+		file1.close()
+		file2.close()
+		return True
 
-
-	# def assertMultiLineEqual(self, first, second, msg=None):
-	# 	"""Assert that two multi-line strings are equal.
-
-	# 	If they aren't, show a nice diff.
-
-	# 	"""
-	# 	self.assertTrue(isinstance(first, str),'First argument is not a string')
-	# 	self.assertTrue(isinstance(second, str),'Second argument is not a string')
-
-	# 	if first != second:
-	# 	    message = ''.join(difflib.ndiff(first.splitlines(True),second.splitlines(True)))
-	# 	    if msg:
-	# 	        message += " : " + msg
-	# 	    self.fail("Multi-line strings are unequal:\n" + message)
-
-	# def test_export_to_htbash(self):
-	# 	general_list = [('FOOBAR1','ABC'),('TEST2','AAB')]
-	# 	robot_variables = [('TEST_CIRCLE','123'),('TEST_MAP','BAR'),('TEST_MASTER_URI','http://100.100.100.100')]
-	# 	# env_os = EnvOs()
-	# 	# env_os.unset_to_htbash()  #default parameter empty list
-	# 	# env_os.export_to_general_htbash(general_list)
-	# 	# env_os.export_to_robot_htbash(robot_variables,'testrobot')
-	# 	rp =rospkg.RosPack()
-	# 	cpath1 = os.path.join(rp.get_path('rqt_env'),'test','.htbashtest') 
-	# 	cpath2 = os.path.join(rp.get_path('rqt_env'),'test','.htbashcompare')
-		# self.assertMultiLineEqual(cpath1,cpath2)
-
-		# self.assertEqual(1,1)
-
-
-
-
+	def test_export_to_htbash(self):
+		general_list = [('FOOBAR1','ABC'),('TEST2','AAB')]
+		robot_variables = [('TEST_CIRCLE','123'),('TEST_MAP','BAR'),('TEST_MASTER_URI','http://100.100.100.100')]
+		env_os = EnvOs()
+		env_os.unset_to_htbash()  #default parameter empty list
+		env_os.export_to_general_htbash(general_list)
+		env_os.export_to_robot_htbash(robot_variables,'testrobot')
+		rp =rospkg.RosPack()
+		cpath1 = os.path.join(rp.get_path('rqt_env'),'test','.htbashtest') 
+		cpath2 = os.path.join(rp.get_path('rqt_env'),'test','.htbashcompare')
+		self.assertTrue(self.assertFiles(cpath1,cpath2))
 
 
 def main():

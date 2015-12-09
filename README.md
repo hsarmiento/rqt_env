@@ -1,8 +1,11 @@
 # Overview
-`rqt_env` is a Python plugin for ROS that helps you configure ROS environment variables using a GUI (graphical user interface). `rqt_env` to manage the ROS environment variables, with validation of environment variables and easy switching between robot configurations.
+`rqt_env` is a Python plugin for ROS that helps you configure ROS environment variables using a GUI (graphical user interface). `rqt_env` manage the ROS environment variables, with validation of environment variables and easy switching between robot configurations.
+
+![rqt_env]({{site.baseurl}}/screenshot.png)
+
 
 # Motivation
-When users set environment variables, they add new lines in different files for to persist values in Operating System. These files (e.g .bashrc, profile.d) can have different assignment for many applications. Then when users modify this files, they comment and uncomment this assignment and in some cases they could edit or remove other variables different to ROS variables. Therefore, human errors is a common issue that can to affect variables in Operating Systems.
+When users set environment variables, they add new lines in different files for to persist values in Operating System. These files (e.g .bashrc, profile.d) can have different assignment for many applications. Then when users modify this files, they comment and uncomment this assignment and in some cases, they could edit or remove other variables different to ROS variables. Therefore, human errors is a common issue that can to affect variables in Operating Systems.
 ```
 HISTSIZE=1000
 HISTFILESIZE=2000
@@ -22,10 +25,17 @@ Then, the main goal of `rqt_env` is to avoid human errors when they configure RO
 
 # Installation
 
-Fork 
+* Download source code unto your workspace
+* Execute `catkin_make` in your workspace
+* In terminal execute: `$ rosrun rqt_env rqt_env`
 
+**Optional**
 
-
+If appear `error on load_plugin`, execute in your terminal: 
+```
+$rm ~./config/ros.org/rqt_gui.ini
+$rqt
+```
 
 # Contributors
 

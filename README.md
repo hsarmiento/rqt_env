@@ -18,6 +18,8 @@ export ROS_MASTER_URI=192.179.11.1
 #export ROS_MASTER_URI=189.180.11.1
 ```
 
+Then, the main goal of `rqt_env` is to avoid human errors when they configure ROS environment variables. So, for basic variables and set of variables for different robots, `rqt_env` allow add and remove these variables without using files as `.bashrc` or `profile.d`
+
 # Installation
 
 # Contributors

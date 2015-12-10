@@ -31,7 +31,7 @@ Then, the main goal of `rqt_env` is to avoid human errors when they configure RO
 
 **Optional**
 
-If appear `error on load_plugin`, execute in your terminal: 
+If appear `PluginManager._load_plugin() could not load plugin "rqt_env/Env"`, execute in your terminal: 
 ```
 $rm ~./config/ros.org/rqt_gui.ini
 $rqt

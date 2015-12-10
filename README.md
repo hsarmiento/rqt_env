@@ -1,7 +1,7 @@
 # Overview
 `rqt_env` is a Python plugin for ROS that helps you configure ROS environment variables using a GUI (graphical user interface). `rqt_env` manage the ROS environment variables, with validation of environment variables and easy switching between robot configurations.
 
-![rqt_env]({{site.baseurl}}/screenshot.png)
+![rqt_env]({http://github.com/hsarmiento/rqt_env/screenshot.png)
 
 
 # Motivation
